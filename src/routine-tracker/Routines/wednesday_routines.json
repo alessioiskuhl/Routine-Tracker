@@ -1,0 +1,28 @@
+{
+    "routines": [
+        {
+            "name" : "Gym",
+            "time" : null,
+            "duration" : null,
+            "subdurations" : [null]
+        },
+        {
+            "name" : "Coddy",
+            "time" : "5:00 PM",
+            "duration" : null,
+            "subdurations" : [null]
+        },
+        {
+            "name" : "Programming",
+            "time" : "5:30 PM",
+            "duration" : 30,
+            "subdurations" : [5, 20, 5]
+        },
+        {
+            "name" : "Rubik's Cube",
+            "time" : "7:00 PM",
+            "duration" : null,
+            "subdurations" : [null]
+        }
+    ]
+}
