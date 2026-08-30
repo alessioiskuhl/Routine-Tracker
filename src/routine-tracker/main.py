@@ -129,7 +129,12 @@ class routine_adder:
                 "subdurations": subdurations
                 }
 
-            
+            if monday_routine["name"].lower not in monday_routines["routines"]:
+                monday_routines["routines"].append(monday_routine)
+                with open(routines_folder / "monday_routines.json", 'w') as file:
+                    json.dump(monday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
 
         elif day == "tuesday" or day == 2:
             tuesday_routine = {
@@ -139,6 +144,13 @@ class routine_adder:
                 "subdurations": subdurations
             }
 
+            if tuesday_routine["name"].lower not in tuesday_routines["routines"]:
+                tuesday_routines["routines"].append(tuesday_routine)
+                with open(routines_folder / "tuesday_routines.json", 'w') as file:
+                    json.dump(tuesday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
+
         elif day == "wednesday" or day == 3:
             wednesday_routine = {
                 "name": name,
@@ -146,6 +158,13 @@ class routine_adder:
                 "duration": duration,
                 "subdurations": subdurations
             }
+
+            if wednesday_routine["name"].lower not in wednesday_routines["routines"]:
+                wednesday_routines["routines"].append(wednesday_routine)
+                with open(routines_folder / "wednesday_routines.json", 'w') as file:
+                    json.dump(wednesday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
 
         elif day == "thursday" or day == 4:
             thursday_routine = {
@@ -155,6 +174,13 @@ class routine_adder:
                 "subdurations": subdurations
             }
 
+            if thursday_routine["name"].lower not in thursday_routines["routines"]:
+                thursday_routines["routines"].append(thursday_routine)
+                with open(routines_folder / "thursday_routines.json", 'w') as file:
+                    json.dump(thursday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
+
         elif day == "friday" or day == 5:
             friday_routine = {
                 "name": name,
@@ -162,6 +188,13 @@ class routine_adder:
                 "duration": duration,
                 "subdurations": subdurations
             }
+
+            if friday_routine["name"].lower not in friday_routines["routines"]:
+                friday_routines["routines"].append(friday_routine)
+                with open(routines_folder / "friday_routines.json", 'w') as file:
+                    json.dump(friday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
 
         elif day == "saturday" or day == 6:
             saturday_routine = {
@@ -171,6 +204,13 @@ class routine_adder:
                 "subdurations": subdurations
             }
 
+            if saturday_routine["name"].lower not in saturday_routines["routines"]:
+                saturday_routines["routines"].append(saturday_routine)
+                with open(routines_folder / "saturday_routines.json", 'w') as file:
+                    json.dump(saturday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
+
         elif day == "sunday" or day == 7:
             sunday_routine = {
                 "name": name,
@@ -178,6 +218,13 @@ class routine_adder:
                 "duration": duration,
                 "subdurations": subdurations
             }
+
+            if sunday_routine["name"].lower not in sunday_routines["routines"]:
+                sunday_routines["routines"].append(sunday_routine)
+                with open(routines_folder / "sunday_routines.json", 'w') as file:
+                    json.dump(sunday_routines, file, indent = 4)
+            else:
+                print(f"{bcolor.FAIL}There is already a routine with the name {monday_routine["name"]} in your monday routines{bcolor.ENDC}")
 
     def time(self, day, name, time):
         pass
@@ -296,10 +343,31 @@ class routine_editor:
 routine = routine_editor()
 
 
-action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)"))
+action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n"))
 if action == 1:
-    adder_option = int(input("What would you like to add?\n1. A routine\n2. A time to a routine without time\n3. A duration to a routine with no duration\n4. A subduration to a routine with a duration"))
+    adder_option = int(input("What would you like to add?\n1. A routine\n2. A time to a routine without time\n3. A duration to a routine with no duration\n4. A subduration to a routine with a duration\n"))
     if adder_option == 1:
-
-
+        try:
+            adder_option_1_day = int(input("To what day would you like to add a routine (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
+            adder_option_1_name = str(input("Please enter the name of your routine: "))
+            adder_option_1_time = input("Please enter the time (None for no specific time): ")
+            if adder_option_1_time == "None":
+                adder_option_1_time = None
+            adder_option_1_duration = input("Please enter you duration in minutes (None for no specific duration): ")
+            if adder_option_1_duration == "None":
+                adder_option_1_duration = None
+            if adder_option_1_duration:
+                adder_option_1_subdurations_notlist = input("Please enter your subdurations in minutes with commas between the numbers (None for no subduration): ")
+                if adder_option_1_subdurations_notlist != "None":
+                    adder_option_1_subdurations = adder_option_1_subdurations_notlist.strip()
+                    if sum(adder_option_1_subdurations) != adder_option_1_duration:
+                        raise AssertionError(f"{bcolor.FAIL}Please enter subdurations adding up to you duration{bcolor.ENDC}")
+                else:
+                    adder_option_1_subdurations = None
+            routine.add.routine(adder_option_1_day, adder_option_1_name, adder_option_1_time, adder_option_1_duration, adder_option_1_subdurations)
+            
+        except ValueError:
+            print(f"{bcolor.FAIL}Please only enter valid formats{bcolor.ENDC}")
+        except Exception as e:
+            print(f"{bcolor.FAIL}Ending script with error: {e}{bcolor.ENDC}")
 

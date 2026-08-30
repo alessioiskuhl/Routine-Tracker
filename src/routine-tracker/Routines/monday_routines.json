@@ -1,1 +1,10 @@
-{"routines": []}
+{
+    "routines": [
+        {
+            "name": "Programming",
+            "time": null,
+            "duration": "30",
+            "subdurations": null
+        }
+    ]
+}
