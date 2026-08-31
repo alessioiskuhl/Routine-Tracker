@@ -1,10 +1,14 @@
 {
     "routines": [
         {
-            "name": "Programming",
+            "name": "programming",
             "time": null,
             "duration": "30",
-            "subdurations": null
+            "subdurations": [
+                5,
+                20,
+                5
+            ]
         }
     ]
 }
