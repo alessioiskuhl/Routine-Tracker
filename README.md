@@ -23,9 +23,6 @@ Nothing here yet
 > This project was developed with the help of AI. AI was used for learning about Python package structure, packaging concepts and related topics, but the application code was written by me.
 
 ## TODO
-- Add the basic timer function
-- Make it work in the terminal
-- Make the splitting possible
 - Add a Tkinter UI
 - Add the "Week Viewer"
 - Make everything look good

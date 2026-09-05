@@ -1,6 +1,7 @@
-"""A simple routine tracker that allows you to track and timme your daily routines."""
+"""A simple routine tracker that allows you to track and time your daily routines."""
 
 
+import time
 from pathlib import Path
 import json
 class bcolor:
@@ -411,8 +412,8 @@ class routine_reader:
                     print(f"for {monday_routines["routines"][i]["duration"]} minutes", end = " ") if monday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {monday_routines["routines"][i]["time"]}") if monday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         elif day == 2:
             if tuesday_routines["routines"]:
                 print("Today's Routine:")
@@ -421,8 +422,8 @@ class routine_reader:
                     print(f"for {tuesday_routines["routines"][i]["duration"]} minutes", end = " ") if tuesday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {tuesday_routines["routines"][i]["time"]}") if tuesday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         elif day == 3:
             if wednesday_routines["routines"]:
                 print("Today's Routine:")
@@ -431,8 +432,8 @@ class routine_reader:
                     print(f"for {wednesday_routines["routines"][i]["duration"]} minutes", end = " ") if wednesday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {wednesday_routines["routines"][i]["time"]}") if wednesday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         elif day == 4:
             if thursday_routines["routines"]:
                 print("Today's Routine:")
@@ -441,8 +442,8 @@ class routine_reader:
                     print(f"for {thursday_routines["routines"][i]["duration"]} minutes", end = " ") if thursday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {thursday_routines["routines"][i]["time"]}") if thursday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         elif day == 5:
             if friday_routines["routines"]:
                 print("Today's Routine:")
@@ -451,8 +452,8 @@ class routine_reader:
                     print(f"for {friday_routines["routines"][i]["duration"]} minutes", end = " ") if friday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {friday_routines["routines"][i]["time"]}") if friday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         elif day == 6:
             if saturday_routines["routines"]:
                 print("Today's Routine:")
@@ -461,8 +462,8 @@ class routine_reader:
                     print(f"for {saturday_routines["routines"][i]["duration"]} minutes", end = " ") if saturday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {saturday_routines["routines"][i]["time"]}") if saturday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
         else:
             if sunday_routines["routines"]:
                 print("Today's Routine:")
@@ -471,15 +472,61 @@ class routine_reader:
                     print(f"for {sunday_routines["routines"][i]["duration"]} minutes", end = " ") if sunday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {sunday_routines["routines"][i]["time"]}") if sunday_routines["routines"][i]["time"] is not None else None
             else:
-                print("No routine today!")
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                return "No routine today!"
 
+class routine_player:
+    def play_routine(self):
+        if current_day == 1:
+            routines = monday_routines["routines"]
+        elif current_day == 2:
+            routines = tuesday_routines["routines"]
+        elif current_day == 3:
+            routines = wednesday_routines["routines"]
+        elif current_day == 4:
+            routines = thursday_routines["routines"]
+        elif current_day == 5:
+            routines = friday_routines["routines"]
+        elif current_day == 6:
+            routines = saturday_routines["routines"]
+        else:
+            routines = sunday_routines["routines"]
+
+        for routine in routines:
+            print(f"Starting routine: {routine['name']}")
+            if routine.get("duration"):
+                if routine.get("subdurations"):
+                    subdurations = routine["subdurations"]
+                    if isinstance(subdurations, str):
+                        subdurations = list(map(int, subdurations.split(',')))
+                    for i, subduration in enumerate(subdurations):
+                        print(f"Starting subduration {i + 1} of {len(subdurations)}: {subduration} minutes")
+                        start = time.time()
+                        while time.time() - start < int(subduration) * 60:
+                            print(f"Time remaining: {int(int(subduration) * 60 - (time.time() - start))} seconds", end="\r")
+                            pass
+                        print(f"{bcolor.OKGREEN}Finished subduration {i + 1} of {len(subdurations)}: {subduration} minutes{bcolor.ENDC}")
+                    if i == len(subdurations) - 1:
+                        print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+                else:
+                    duration = int(routine["duration"])
+                    print(f"Duration: {duration} minutes")
+                    start = time.time()
+                    while time.time() - start < duration * 60:
+                        print(f"Time remaining: {int(duration * 60 - (time.time() - start))} seconds", end="\r")
+                        pass
+                    print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+            else:
+                print(f"No duration specified for routine: {routine['name']}. Skipping.")
+            
+        print(f"{bcolor.OKGREEN}All routines for today have been completed!{bcolor.ENDC}")
 class routine_editor:
     def __init__(self):
         self.add = routine_adder()
         self.clear = routine_clearer()
         self.edit = routine_edit()
         self.read = routine_reader()
+        self.play = routine_player()
 routine = routine_editor()
 
 try:
@@ -580,7 +627,15 @@ try:
             print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
 
     elif action == 4:
-        routine.read.routine(current_day)
+        if routine.read.routine(current_day) != "No routine today!":
+            play_choice = input("\nWould you like to play your routine? (y/n): ")
+            if play_choice.lower() == "y":
+                print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
+                routine.play.play_routine()
+            elif play_choice.lower() == "n":
+                print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
+        else:
+            print(f"{bcolor.WARNING}You have no routine today. Exiting the program.{bcolor.ENDC}")
 
     else:
         print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
