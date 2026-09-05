@@ -2,9 +2,9 @@
     "routines": [
         {
             "name": "programming",
-            "time": "5 pm",
+            "time": null,
             "duration": "30",
-            "subdurations": null
+            "subdurations": "5, 20, 5"
         }
     ]
 }

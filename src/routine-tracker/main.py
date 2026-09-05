@@ -175,28 +175,6 @@ class routine_adder:
 
         raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
 
-    def _set_field_subdurations(self, day, name, field, value):
-        day_name = self._normalize_day(day)
-        path, data = self._load_data(day_name)
-        duration = None
-        for i in range(len(data["routines"])):
-            if data["routines"][i]["name"] == name:
-                duration = data["routines"][i]["duration"]
-        if duration is None:
-            raise AssertionError(f"{bcolor.FAIL}Please add a duration to the routine {name} in your {day_name} routines before adding subdurations{bcolor.ENDC}")
-
-        if int(sum(value)) != int(duration):
-            raise AssertionError(f"{bcolor.FAIL}Please enter subdurations adding up to you duration. Sum is: {sum(value)}, but duration is: {duration}{bcolor.ENDC}")
-
-        for routine in data["routines"]:
-            if routine["name"] == name:
-                if routine.get(field) is not None:
-                    raise AssertionError(f"{bcolor.FAIL}There is already a {field} for the routine {name} in your {day_name} routines{bcolor.ENDC}")
-                routine[field] = value
-                self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully added {field} to the routine {name} in your {day_name} routines{bcolor.ENDC}"
-
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
 
     def routine(self, day, name, time, duration, subdurations):
         day_name = self._normalize_day(day)
@@ -223,15 +201,8 @@ class routine_adder:
     def duration(self, day, name, duration):
         return self._set_field(day, name, "duration", duration)
 
-    def subdurations(self, day, name, subdurations_notlist):
-        try:
-            if subdurations_notlist != "None" and subdurations_notlist != "none":
-                subdurations = list(map(int, subdurations_notlist.split(',')))
-            else:
-                subdurations = None
-        except Exception as e:
-            print(f"{bcolor.FAIL}An error occurred while processing subdurations: {e}{bcolor.ENDC}")
-        return self._set_field_subdurations(day, name, "subdurations", subdurations)
+    def subdurations(self, day, name, subdurations):
+        return self._set_field(day, name, "subdurations", subdurations)
 
 
 class routine_clearer:
@@ -553,7 +524,7 @@ try:
                 else:
                     adder_option_1_duration = None
                     adder_option_1_subdurations = None
-                print(routine.add.routine(adder_option_1_day, adder_option_1_name, adder_option_1_time, adder_option_1_duration, adder_option_1_subdurations_notlist))
+                print(routine.add.routine(adder_option_1_day, adder_option_1_name, adder_option_1_time, int(adder_option_1_duration), adder_option_1_subdurations_notlist))
         elif adder_option == 2:
             adder_option_2_day = int(input("To what day would you like to add a time (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             adder_option_2_name = str(input("Please enter the name of your routine: "))
@@ -563,15 +534,14 @@ try:
         elif adder_option == 3:
             adder_option_3_day = int(input("To what day would you like to add a duration (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             adder_option_3_name = str(input("Please enter the name of your routine: "))
-            adder_option_3_duration = input("Please enter the duration you would like to add in minutes: ")
+            adder_option_3_duration = int(input("Please enter the duration you would like to add in minutes: "))
             print(routine.add.duration(adder_option_3_day, adder_option_3_name, adder_option_3_duration))
 
         elif adder_option == 4:
-            print(f"{bcolor.FAIL}NOTE: All previously added subdurations will be deleted if you add new subdurations!{bcolor.ENDC}")
             adder_option_4_day = int(input("To what day would you like to add subdurations (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             adder_option_4_name = str(input("Please enter the name of your routine: "))
             adder_option_4_subdurations_notlist = input("Please enter your subdurations in minutes with a comma and a space between the numbers: ")
-            print(routine.add.subdurations(adder_option_4_day, adder_option_4_name, list(map(int, adder_option_4_subdurations_notlist.split(',')))))
+            print(routine.add.subdurations(adder_option_4_day, adder_option_4_name, adder_option_4_subdurations_notlist))
 
         else:
             print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
@@ -641,8 +611,8 @@ try:
         print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
 
             
-except ValueError:
-    print(f"{bcolor.FAIL}Please only enter valid formats!{bcolor.ENDC}")
+except ValueError as e:
+    print(f"{bcolor.FAIL}Please only enter valid formats! {e}{bcolor.ENDC}")
 except TypeError as e:
     print(f"{bcolor.FAIL}Please make sure you followed the instructions for the format! The following error occured: {e}{bcolor.ENDC}")
 except Exception as e:
