@@ -1,6 +1,7 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
 
+from itertools import islice
 import time
 from pathlib import Path
 import json
@@ -17,6 +18,7 @@ class bcolor:
 from datetime import datetime
 dt = datetime.now()
 current_day = dt.isoweekday()
+current_date = datetime.today().strftime('%Y-%m-%d')
 
 script_dir = Path(__file__).resolve().parent
 routines_folder = script_dir / "Routines"
@@ -25,7 +27,8 @@ file_path = routines_folder / "monday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}monday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -36,7 +39,8 @@ file_path = routines_folder / "tuesday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}tuesday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -47,7 +51,8 @@ file_path = routines_folder / "wednesday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}wednesday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -58,7 +63,8 @@ file_path = routines_folder / "thursday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}thursday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -69,7 +75,8 @@ file_path = routines_folder / "friday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}friday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -80,7 +87,8 @@ file_path = routines_folder / "saturday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}saturday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
@@ -91,13 +99,56 @@ file_path = routines_folder / "sunday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
-            "routines": []
+            "routines": [],
+            f"progress{current_date}" : []
         }))
     print(f"{bcolor.OKGREEN}sunday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
     print(f"{bcolor.FAIL}An error occurred while creating or writing to sunday_routines.json: {e}{bcolor.ENDC}")
+
+DAY_FILES = {
+    "monday": "monday_routines.json",
+    "tuesday": "tuesday_routines.json",
+    "wednesday": "wednesday_routines.json",
+    "thursday": "thursday_routines.json",
+    "friday": "friday_routines.json",
+    "saturday": "saturday_routines.json",
+    "sunday": "sunday_routines.json",
+}
+DAY_NUMBERS = {
+    1: "monday",
+    2: "tuesday",
+    3: "wednesday",
+    4: "thursday",
+    5: "friday",
+    6: "saturday",
+    7: "sunday",
+}
+
+def _normalize_day(day):
+    if isinstance(day, int):
+            return DAY_NUMBERS[day]
+    return str(day).lower()
+
+
+path = routines_folder / f"{_normalize_day(current_day)}_routines.json"
+with path.open(encoding="utf-8") as file:
+    data = json.load(file)
+if not len(list(data.keys())) > 1:
+    data[f"progress{current_date}"] = []
+    for routine in data["routines"]:
+            data[f"progress{current_date}"].append({f"routine_{routine["name"]}_completed": False})
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+elif list(data.keys())[1] != f"progress{current_date}":
+    del data[list(data.keys())[1]]
+    data[f"progress{current_date}"] = []
+    for routine in data["routines"]:
+        data[f"progress{current_date}"].append({f"routine_{routine['name']}_completed": False})
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
 
 
 file_path = routines_folder / "monday_routines.json"
@@ -122,7 +173,65 @@ file_path = routines_folder / "sunday_routines.json"
 with file_path.open(encoding="utf-8") as file:
     sunday_routines = json.load(file)
 
+class routine_progress:
+    DAY_FILES = {
+        "monday": "monday_routines.json",
+        "tuesday": "tuesday_routines.json",
+        "wednesday": "wednesday_routines.json",
+        "thursday": "thursday_routines.json",
+        "friday": "friday_routines.json",
+        "saturday": "saturday_routines.json",
+        "sunday": "sunday_routines.json",
+    }
+    DAY_NUMBERS = {
+        1: "monday",
+        2: "tuesday",
+        3: "wednesday",
+        4: "thursday",
+        5: "friday",
+        6: "saturday",
+        7: "sunday",
+    }
+    
+    @classmethod
+    def _normalize_day(cls, day):
+        if isinstance(day, int):
+                return cls.DAY_NUMBERS[day]
+        return str(day).lower()
+    
+    def __init__(self):
+        self.today = current_day
+        current_routines = self.get_current_routines()
+        self.current_date = datetime.today().strftime('%Y-%m-%d')
 
+    def get_current_routines(self):
+        day_name = self._normalize_day(self.today)
+        path = routines_folder / f"{day_name}_routines.json"
+        with path.open(encoding="utf-8") as file:
+            data = json.load(file)
+        return data["routines"]
+
+    def complete(self, routine_name):
+        print(f"completing {routine_name}")
+        day_name = self._normalize_day(self.today)
+        path = routines_folder / f"{day_name}_routines.json"
+        with path.open(encoding="utf-8") as file:
+            data = json.load(file)
+            print(f"data loaded: {data}")
+
+        for routine in data["routines"]:
+            print(f"checking routine: {routine['name']}")
+            if routine["name"] == routine_name:
+                print(f"marking routine {routine_name} as complete")
+                data[f"progress{self.current_date}"].append({f"routine_{routine_name}_completed": True})
+                break
+        else:
+            raise ValueError(f"No routine found with name: {routine_name}")
+
+        with path.open("w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+
+    
 class routine_adder:
     DAY_FILES = {
         "monday": "monday_routines.json",
@@ -448,6 +557,7 @@ class routine_reader:
 
 class routine_player:
     def play_routine(self):
+        progress_tracker = routine_progress()
         if current_day == 1:
             routines = monday_routines["routines"]
         elif current_day == 2:
@@ -465,8 +575,8 @@ class routine_player:
 
         for routine in routines:
             print(f"Starting routine: {routine['name']}")
-            if routine.get("duration"):
-                if routine.get("subdurations"):
+            if routine.get("duration") not in ("None", None):
+                if routine.get("subdurations") not in ("None", None, [], ""):
                     subdurations = routine["subdurations"]
                     if isinstance(subdurations, str):
                         subdurations = list(map(int, subdurations.split(',')))
@@ -479,6 +589,8 @@ class routine_player:
                         print(f"{bcolor.OKGREEN}Finished subduration {i + 1} of {len(subdurations)}: {subduration} minutes{bcolor.ENDC}")
                     if i == len(subdurations) - 1:
                         print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+                        progress_tracker.complete(routine["name"])
+
                 else:
                     duration = int(routine["duration"])
                     print(f"Duration: {duration} minutes")
@@ -487,6 +599,7 @@ class routine_player:
                         print(f"Time remaining: {int(duration * 60 - (time.time() - start))} seconds", end="\r")
                         pass
                     print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+                    progress_tracker.complete(routine["name"])
             else:
                 print(f"No duration specified for routine: {routine['name']}. Skipping.")
             
@@ -498,10 +611,11 @@ class routine_editor:
         self.edit = routine_edit()
         self.read = routine_reader()
         self.play = routine_player()
+        self.progress = routine_progress()
 routine = routine_editor()
 
 try:
-    action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n"))
+    action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n5. Exit\n"))
     if action == 1:
         adder_option = int(input("What would you like to add?\n1. A routine\n2. A time to a routine without time\n3. A duration to a routine with no duration\n4. A subduration to a routine with a duration\n"))
         if adder_option == 1:
@@ -607,8 +721,12 @@ try:
         else:
             print(f"{bcolor.WARNING}You have no routine today. Exiting the program.{bcolor.ENDC}")
 
+    elif action == 5:
+        print(f"{bcolor.FAIL}Exiting the programm...{bcolor.ENDC}")
+        exit()
+
     else:
-        print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
+        print(f"{bcolor.FAIL}Please only enter a number between 1 and 5!{bcolor.ENDC}")
 
             
 except ValueError as e:
