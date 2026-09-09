@@ -555,6 +555,27 @@ class routine_reader:
                 print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
                 return "No routine today!"
 
+    def completion_status(self):
+        day_name = _normalize_day(current_day)
+        path = routines_folder / f"{day_name}_routines.json"
+        with path.open(encoding="utf-8") as file:
+            data = json.load(file)
+
+        progress_key = f"progress{current_date}"
+        if progress_key not in data:
+            print(f"{bcolor.WARNING}No progress data found for {day_name} routines on {current_date}.{bcolor.ENDC}")
+            return
+
+        print(f"Completion Status for {day_name.capitalize()} Routines on {current_date}:")
+        if not data["routines"]:
+            raise AssertionError(f"{bcolor.FAIL}No routines found for {day_name} routines. Please add routines to track completion status!{bcolor.ENDC}")
+            return
+        for routine in data["routines"]:
+            routine_name = routine["name"]
+            completed = any(progress.get(f"routine_{routine_name}_completed", False) for progress in data[progress_key])
+            status = "Completed" if completed else "Not Completed"
+            print(f"- {routine_name}: {status}")
+
 class routine_player:
     def play_routine(self):
         progress_tracker = routine_progress()
@@ -590,6 +611,9 @@ class routine_player:
                     if i == len(subdurations) - 1:
                         print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
                         progress_tracker.complete(routine["name"])
+                        next = input("Would you like to continue to the next routine? (y/n): ")
+                        if next.lower() != "y":
+                            break
 
                 else:
                     duration = int(routine["duration"])
@@ -600,6 +624,9 @@ class routine_player:
                         pass
                     print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
                     progress_tracker.complete(routine["name"])
+                    next = input("Would you like to continue to the next routine? (y/n): ")
+                    if next.lower() != "y":
+                        break
             else:
                 print(f"No duration specified for routine: {routine['name']}. Skipping.")
             
@@ -711,15 +738,30 @@ try:
             print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
 
     elif action == 4:
-        if routine.read.routine(current_day) != "No routine today!":
-            play_choice = input("\nWould you like to play your routine? (y/n): ")
-            if play_choice.lower() == "y":
-                print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
-                routine.play.play_routine()
-            elif play_choice.lower() == "n":
-                print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
-        else:
-            print(f"{bcolor.WARNING}You have no routine today. Exiting the program.{bcolor.ENDC}")
+        option_4 = input("What would you like to view?\n1. Today's routine\n2. A specific day's routine\n3. The completion status of today's routines\n")
+        if option_4 == "1":
+            if routine.read.routine(current_day) != "No routine today!":
+                play_choice = input("\nWould you like to play your routine? (y/n): ")
+                if play_choice.lower() == "y":
+                    print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
+                    routine.play.play_routine()
+                elif play_choice.lower() == "n":
+                    print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
+            else:
+                print(f"{bcolor.WARNING}You have no routine today. Exiting the program.{bcolor.ENDC}")
+        elif option_4 == "2":
+            specific_day = int(input("Please enter the day you would like to view (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
+            if routine.read.routine(specific_day) != "No routine today!":
+                play_choice = input("\nWould you like to play your routine? (y/n): ")
+                if play_choice.lower() == "y":
+                    print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
+                    routine.play.play_routine()
+                elif play_choice.lower() == "n":
+                    print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
+            else:
+                print(f"{bcolor.WARNING}You have no routine for {_normalize_day(specific_day)}. Exiting the program.{bcolor.ENDC}")
+        elif option_4 == "3":
+            routine.read.completion_status()
 
     elif action == 5:
         print(f"{bcolor.FAIL}Exiting the programm...{bcolor.ENDC}")
