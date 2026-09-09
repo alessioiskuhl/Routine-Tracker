@@ -5,6 +5,8 @@ A simple Routine tracker for myself to make my future journey a bit easier
 - Creating a Timer for a certain Task
 - Splitting a Timer into multiple subtimers
 - Organizing the Timers into weekdays like a Calender
+- Saving routines in json files
+- Saving completion status for the day
 
 ## Technologies
 
@@ -29,7 +31,7 @@ Usage is and will be very intuitive for simple everyday use.
 - Add long time statistics
 - Add a streak system
 - Add categories
-- Add a Tkinter UI
+- Add a PySide6 UI
 - Add the "Week Viewer"
 - Make everything look good
 - Publish the Project
