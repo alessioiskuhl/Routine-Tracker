@@ -15,12 +15,20 @@ class bcolor:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-from datetime import datetime
+from datetime import datetime, timedelta
 dt = datetime.now()
 current_day = dt.isoweekday()
 current_date = datetime.today().strftime('%Y-%m-%d')
+current_week = datetime.date(datetime.today()).isocalendar()[1]
+current_month = datetime.today().month
+yesterday_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+last_week = current_week - 1 if current_week > 1 else 52
+last_month = current_month - 1 if current_month > 1 else 12
+last_year = datetime.today().year - 1
 
 script_dir = Path(__file__).resolve().parent
+statistics_folder = script_dir / "Statistics"
+statistics_folder.mkdir(parents=True, exist_ok=True)
 routines_folder = script_dir / "Routines"
 routines_folder.mkdir(parents=True, exist_ok=True)
 file_path = routines_folder / "monday_routines.json"
@@ -107,6 +115,31 @@ except FileExistsError:
     pass
 except Exception as e:
     print(f"{bcolor.FAIL}An error occurred while creating or writing to sunday_routines.json: {e}{bcolor.ENDC}")
+file_path = statistics_folder / "statistics.json"
+try:
+    with open(file_path, "x", encoding="utf-8") as file:
+        file.write(json.dumps({
+            "statistics": [{
+                f"completion rate today ({current_date})" : 0,
+                f"completion rate this week ({current_week})" : 0,
+                f"completion rate this month ({current_month})" : 0,
+                f"completion rate this year ({datetime.today().year})" : 0,
+                f"completion rate yesterday ({yesterday_date})" : 0,
+                f"completion rate last week ({last_week})" : 0,
+                f"completion rate last month ({last_month})" : 0,
+                f"completion rate last year ({last_year})" : 0,
+                "completion rate all time" : 0,
+                f"completed routines today ({current_date})" : 0,
+                f"remaining routines today ({current_date})" : 0,
+                "total completions" : 0,
+                
+            }]
+        }, indent=4))
+    print(f"{bcolor.OKGREEN}statistics.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+except FileExistsError:
+    pass
+except Exception as e:
+    print(f"{bcolor.FAIL}An error occurred while creating or writing to statistics.json: {e}{bcolor.ENDC}")
 
 DAY_FILES = {
     "monday": "monday_routines.json",
@@ -642,7 +675,7 @@ class routine_editor:
 routine = routine_editor()
 
 try:
-    action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n5. Exit\n"))
+    action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n5. View statistics\n6. Exit\n"))
     if action == 1:
         adder_option = int(input("What would you like to add?\n1. A routine\n2. A time to a routine without time\n3. A duration to a routine with no duration\n4. A subduration to a routine with a duration\n"))
         if adder_option == 1:
@@ -763,7 +796,7 @@ try:
         elif option_4 == "3":
             routine.read.completion_status()
 
-    elif action == 5:
+    elif action == 6:
         print(f"{bcolor.FAIL}Exiting the programm...{bcolor.ENDC}")
         exit()
 
