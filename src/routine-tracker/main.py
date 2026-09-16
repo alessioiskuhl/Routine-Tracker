@@ -120,19 +120,20 @@ try:
     with open(file_path, "x", encoding="utf-8") as file:
         file.write(json.dumps({
             "statistics": [{
-                f"completion rate today ({current_date})" : 0,
-                f"completion rate this week ({current_week})" : 0,
-                f"completion rate this month ({current_month})" : 0,
-                f"completion rate this year ({datetime.today().year})" : 0,
-                f"completion rate yesterday ({yesterday_date})" : 0,
-                f"completion rate last week ({last_week})" : 0,
-                f"completion rate last month ({last_month})" : 0,
-                f"completion rate last year ({last_year})" : 0,
-                "completion rate all time" : 0,
+                f"completions today ({current_date})" : 0,
+                f"completions this week ({current_week})" : 0,
+                f"completions this month ({current_month})" : 0,
+                f"completions this year ({datetime.today().year})" : 0,
+                f"completions yesterday ({yesterday_date})" : 0,
+                f"completions last week ({last_week})" : 0,
+                f"completions last month ({last_month})" : 0,
+                f"completions last year ({last_year})" : 0,
+                "completions all time" : 0,
                 f"completed routines today ({current_date})" : 0,
-                f"remaining routines today ({current_date})" : 0,
                 "total completions" : 0,
-                
+                f"Current Streak ({current_date})" : 0,
+                f"Longest Streak ({current_date})" : 0,
+                f"Current streak status ({current_date})" : "None",
             }]
         }, indent=4))
     print(f"{bcolor.OKGREEN}statistics.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
@@ -140,6 +141,35 @@ except FileExistsError:
     pass
 except Exception as e:
     print(f"{bcolor.FAIL}An error occurred while creating or writing to statistics.json: {e}{bcolor.ENDC}")
+
+with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file:
+    data = json.load(file)
+    statistics = data["statistics"][0]
+    today_key = next((key for key in statistics if key.startswith("completions today (")), None)
+
+    if today_key is None or current_date not in today_key:
+        yesterday_completions = statistics.get(today_key, 0)
+        replacements = {
+            "completions today (": (f"completions today ({current_date})", 0),
+            "completions yesterday (": (f"completions yesterday ({yesterday_date})", yesterday_completions),
+            "remaining routines today (": (f"remaining routines today ({current_date})", 0),
+            "completed routines today (": (f"completed routines today ({current_date})", 0),
+            "Current Streak (": (f"Current Streak ({current_date})", 0),
+            "Longest Streak (": (f"Longest Streak ({current_date})", 0),
+            "Current streak status (": (f"Current streak status ({current_date})", "None"),
+        }
+        updated_statistics = {}
+        for key, value in statistics.items():
+            replacement = next((item for prefix, item in replacements.items() if key.startswith(prefix)), None)
+            if replacement is None:
+                updated_statistics[key] = value
+            else:
+                updated_statistics[replacement[0]] = replacement[1]
+        statistics = updated_statistics
+        data["statistics"][0] = statistics
+        file.seek(0)
+        json.dump(data, file, indent=4)
+        file.truncate()
 
 DAY_FILES = {
     "monday": "monday_routines.json",
