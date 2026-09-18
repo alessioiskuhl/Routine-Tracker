@@ -137,6 +137,7 @@ try:
             }]
         }, indent=4))
     print(f"{bcolor.OKGREEN}statistics.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+
 except FileExistsError:
     pass
 except Exception as e:
@@ -147,20 +148,48 @@ with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file
     statistics = data["statistics"][0]
     today_key = next((key for key in statistics if key.startswith("completions today (")), None)
 
-    if today_key is None or current_date not in today_key:
+    period_definitions = {
+        "week": ("completions this week (", current_week, "completions last week ("),
+        "month": ("completions this month (", current_month, "completions last month ("),
+        "year": ("completions this year (", datetime.today().year, "completions last year ("),
+    }
+    replacements = {}
+    day_changed = today_key is None or current_date not in today_key
+
+    if day_changed:
         yesterday_completions = statistics.get(today_key, 0)
-        replacements = {
-            "completions today (": (f"completions today ({current_date})", 0),
-            "completions yesterday (": (f"completions yesterday ({yesterday_date})", yesterday_completions),
-            "remaining routines today (": (f"remaining routines today ({current_date})", 0),
-            "completed routines today (": (f"completed routines today ({current_date})", 0),
-            "Current Streak (": (f"Current Streak ({current_date})", 0),
-            "Longest Streak (": (f"Longest Streak ({current_date})", 0),
-            "Current streak status (": (f"Current streak status ({current_date})", "None"),
-        }
+        replacements[today_key] = (f"completions today ({current_date})", 0)
+        yesterday_key = next((key for key in statistics if key.startswith("completions yesterday (")), None)
+        if yesterday_key is not None:
+            replacements[yesterday_key] = (f"completions yesterday ({yesterday_date})", yesterday_completions)
+        replacements.update({
+            key: value for key, value in (
+                (next((key for key in statistics if key.startswith(prefix)), None), replacement)
+                for prefix, replacement in {
+                    "remaining routines today (": (f"remaining routines today ({current_date})", 0),
+                    "Current Streak (": (f"Current Streak ({current_date})", 0),
+                    "Longest Streak (": (f"Longest Streak ({current_date})", 0),
+                    "Current streak status (": (f"Current streak status ({current_date})", "None"),
+                }.items()
+            ) if key is not None
+        })
+
+    for current_prefix, period_number, last_prefix in period_definitions.values():
+        current_key = next((key for key in statistics if key.startswith(current_prefix)), None)
+        if current_key is None or f"({period_number})" in current_key:
+            continue
+
+        old_value = statistics[current_key]
+        old_number = current_key.removeprefix(current_prefix).removesuffix(")")
+        replacements[current_key] = (f"{current_prefix}{period_number})", 0)
+        last_key = next((key for key in statistics if key.startswith(last_prefix)), None)
+        if last_key is not None:
+            replacements[last_key] = (f"{last_prefix}{old_number})", old_value)
+
+    if replacements:
         updated_statistics = {}
         for key, value in statistics.items():
-            replacement = next((item for prefix, item in replacements.items() if key.startswith(prefix)), None)
+            replacement = replacements.get(key)
             if replacement is None:
                 updated_statistics[key] = value
             else:
@@ -275,17 +304,13 @@ class routine_progress:
         return data["routines"]
 
     def complete(self, routine_name):
-        print(f"completing {routine_name}")
         day_name = self._normalize_day(self.today)
         path = routines_folder / f"{day_name}_routines.json"
         with path.open(encoding="utf-8") as file:
             data = json.load(file)
-            print(f"data loaded: {data}")
 
         for routine in data["routines"]:
-            print(f"checking routine: {routine['name']}")
             if routine["name"] == routine_name:
-                print(f"marking routine {routine_name} as complete")
                 data[f"progress{self.current_date}"].append({f"routine_{routine_name}_completed": True})
                 break
         else:
@@ -293,6 +318,38 @@ class routine_progress:
 
         with path.open("w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
+
+        path = statistics_folder / "statistics.json"
+        with path.open(encoding="utf-8") as file:
+            stats_data = json.load(file)
+            stats = stats_data["statistics"][0]
+
+        stats[f"completions today ({self.current_date})"] += 1
+        stats[f"completions this week ({current_week})"] += 1
+        stats[f"completions this month ({current_month})"] += 1
+        stats[f"completions this year ({datetime.today().year})"] += 1
+        stats["completions all time"] += 1
+        if f"Current streak status ({current_date})" in stats:
+            if stats[f"Current streak status ({current_date})"] == "unactive":
+                stats[f"Current streak status ({current_date})"] = "active"
+                stats[f"Current Streak ({current_date})"] += 1
+                if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
+                    stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
+        elif f"Current streak status ({yesterday_date})" in stats:
+            stats[f"Current streak status ({current_date})"] = stats[f"Current streak status ({yesterday_date})"].pop()
+            if stats[f"Current streak status ({current_date})"] == "unactive":
+                stats[f"Current streak status ({current_date})"] = "active"
+                stats[f"Current Streak ({current_date})"] += 1
+                if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
+                    stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
+        else:
+                        
+
+
+        with path.open("w", encoding="utf-8") as file:
+            json.dump(stats_data, file, indent = 4)
+
+        
 
     
 class routine_adder:
