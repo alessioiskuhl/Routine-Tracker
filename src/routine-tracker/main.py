@@ -343,7 +343,18 @@ class routine_progress:
                 if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
                     stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
         else:
-                        
+            for key in list(stats):
+                if key.startswith("Current streak status ("):
+                    stats[f"Current streak status ({current_date})"] = stats[key].pop()
+                    stats[f"Current streak status ({current_date})"] = "active"
+                elif key.startswith("Current Streak ("):
+                    stats[f"Current Streak ({current_date})"] = stats[key].pop()
+                    stats[f"Current Streak ({current_date})"] = 1
+                    for key1 in list(stats):
+                        if key1.startswith("Longest Streak ("):
+                            stats[f"Longest Streak ({current_date})"] = stats[key1].pop()
+                            if stats[f"Longest Streak ({current_date})"] < stats[f"Current Streak ({current_date})"]:
+                                stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
 
 
         with path.open("w", encoding="utf-8") as file:
@@ -861,7 +872,7 @@ try:
         option_4 = input("What would you like to view?\n1. Today's routine\n2. A specific day's routine\n3. The completion status of today's routines\n")
         if option_4 == "1":
             if routine.read.routine(current_day) != "No routine today!":
-                play_choice = input("\nWould you like to play your routine? (y/n): ")
+                play_choice = input("\n\nWould you like to play your routine? (y/n): ")
                 if play_choice.lower() == "y":
                     print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
                     routine.play.play_routine()
@@ -872,7 +883,7 @@ try:
         elif option_4 == "2":
             specific_day = int(input("Please enter the day you would like to view (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             if routine.read.routine(specific_day) != "No routine today!":
-                play_choice = input("\nWould you like to play your routine? (y/n): ")
+                play_choice = input("\n\nWould you like to play your routine? (y/n): ")
                 if play_choice.lower() == "y":
                     print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
                     routine.play.play_routine()
@@ -882,13 +893,18 @@ try:
                 print(f"{bcolor.WARNING}You have no routine for {_normalize_day(specific_day)}. Exiting the program.{bcolor.ENDC}")
         elif option_4 == "3":
             routine.read.completion_status()
-
+    elif action == 5:
+        with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file:
+            data = json.load(file)
+            stats = data["statistics"][0]
+            for key, value in stats.items():
+                print(f"{key} = {value}")
     elif action == 6:
         print(f"{bcolor.FAIL}Exiting the programm...{bcolor.ENDC}")
         exit()
 
     else:
-        print(f"{bcolor.FAIL}Please only enter a number between 1 and 5!{bcolor.ENDC}")
+        print(f"{bcolor.FAIL}Please only enter a number between 1 and 6!{bcolor.ENDC}")
 
             
 except ValueError as e:
