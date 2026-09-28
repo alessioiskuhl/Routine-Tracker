@@ -129,8 +129,6 @@ try:
                 f"completions last month ({last_month})" : 0,
                 f"completions last year ({last_year})" : 0,
                 "completions all time" : 0,
-                f"completed routines today ({current_date})" : 0,
-                "total completions" : 0,
                 f"Current Streak ({current_date})" : 0,
                 f"Longest Streak ({current_date})" : 0,
                 f"Current streak status ({current_date})" : "None",
@@ -155,6 +153,7 @@ with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file
     }
     replacements = {}
     day_changed = today_key is None or current_date not in today_key
+    day_changed_yesterday = today_key is yesterday_date
 
     if day_changed:
         yesterday_completions = statistics.get(today_key, 0)
@@ -167,9 +166,7 @@ with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file
                 (next((key for key in statistics if key.startswith(prefix)), None), replacement)
                 for prefix, replacement in {
                     "remaining routines today (": (f"remaining routines today ({current_date})", 0),
-                    "Current Streak (": (f"Current Streak ({current_date})", 0),
-                    "Longest Streak (": (f"Longest Streak ({current_date})", 0),
-                    "Current streak status (": (f"Current streak status ({current_date})", "None"),
+                    "Current streak status (": (f"Current streak status ({current_date})", "unactive") if day_changed_yesterday else (f"Current streak status ({current_date})", "None"),
                 }.items()
             ) if key is not None
         })
@@ -337,7 +334,7 @@ class routine_progress:
                     stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
         elif f"Current streak status ({yesterday_date})" in stats:
             stats[f"Current streak status ({current_date})"] = stats[f"Current streak status ({yesterday_date})"].pop()
-            if stats[f"Current streak status ({current_date})"] == "unactive":
+            if stats[f"Current streak status ({current_date})"] == "unactive" or stats[f"Current streak status ({current_date})"] == "active":
                 stats[f"Current streak status ({current_date})"] = "active"
                 stats[f"Current Streak ({current_date})"] += 1
                 if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
