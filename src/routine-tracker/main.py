@@ -327,10 +327,26 @@ class routine_progress:
         stats[f"completions this year ({datetime.today().year})"] += 1
         stats["completions all time"] += 1
         if f"Current streak status ({current_date})" in stats:
-            if stats[f"Current streak status ({current_date})"] == "unactive":
+            if stats[f"Current streak status ({current_date})"] == "None":
                 stats[f"Current streak status ({current_date})"] = "active"
-                stats[f"Current Streak ({current_date})"] += 1
-                if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
+                if f"Current Streak ({current_date})" in stats:
+                    stats[f"Current Streak ({current_date})"] += 1
+                elif f"Current Streak ({yesterday_date})" in stats:
+                    stats[f"Current Streak ({current_date})"] = stats[f"Current Streak ({yesterday_date})"] + 1
+                else:
+                    stats[f"Current Streak ({current_date})"] = 1
+                if f"Longest Streak ({current_date})" in stats:
+                    if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
+                        stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
+                elif f"Longest Streak ({yesterday_date})" in stats:
+                    if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({yesterday_date})"]:
+                        stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
+                else:
+                    for key in list(stats):
+                        if key.startswith("Longest Streak ("):
+                            stats[f"Longest Streak ({current_date})"] = stats[key].pop()
+                            if stats[f"Current Streak ({current_date})"] > stats[f"Longest Streak ({current_date})"]:
+                                stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
                     stats[f"Longest Streak ({current_date})"] = stats[f"Current Streak ({current_date})"]
         elif f"Current streak status ({yesterday_date})" in stats:
             stats[f"Current streak status ({current_date})"] = stats[f"Current streak status ({yesterday_date})"].pop()
@@ -723,6 +739,9 @@ class routine_player:
             routines = sunday_routines["routines"]
 
         for routine in routines:
+            if f"routine_{routine['name']}_completed" in [key for progress in data[f"progress{current_date}"] for key in progress]:
+                print(f"{bcolor.WARNING}Routine '{routine['name']}' has already been completed today. Skipping.{bcolor.ENDC}")
+                continue
             print(f"Starting routine: {routine['name']}")
             if routine.get("duration") not in ("None", None):
                 if routine.get("subdurations") not in ("None", None, [], ""):
@@ -769,6 +788,7 @@ class routine_editor:
         self.progress = routine_progress()
 routine = routine_editor()
 
+
 try:
     action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n5. View statistics\n6. Exit\n"))
     if action == 1:
@@ -777,14 +797,14 @@ try:
                 adder_option_1_day = int(input("To what day would you like to add a routine (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
                 adder_option_1_name = str(input("Please enter the name of your routine: "))
                 adder_option_1_time = input("Please enter the time (None for no specific time): ")
-                if adder_option_1_time == "None" or adder_option_1_time == "none":
+                if adder_option_1_time.lower() == "none":
                     adder_option_1_time = None
                 adder_option_1_duration = input("Please enter you duration in minutes (None for no specific duration): ")
-                if adder_option_1_duration == "None" or adder_option_1_duration == "none":
+                if adder_option_1_duration.lower() == "none":
                     adder_option_1_duration = None
                 if adder_option_1_duration:
                     adder_option_1_subdurations_notlist = input("Please enter your subdurations in minutes with a comma and a space between the numbers (None for no subduration): ")
-                    if adder_option_1_subdurations_notlist != "None" and adder_option_1_subdurations_notlist != "none":
+                    if adder_option_1_subdurations_notlist.lower() != "none":
                         adder_option_1_subdurations = list(map(int, adder_option_1_subdurations_notlist.split(',')))
                         if int(sum(adder_option_1_subdurations)) != int(adder_option_1_duration):
                             raise AssertionError(f"{bcolor.FAIL}Please enter subdurations adding up to you duration. Sum is: {sum(adder_option_1_subdurations)}, but duration is: {adder_option_1_duration}{bcolor.ENDC}")
