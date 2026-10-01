@@ -29,7 +29,6 @@ Usage is and will be very intuitive for simple everyday use.
 > This project was developed with the help of AI. AI was used for learning about Python package structure, packaging concepts and related topics, but the application code was written by me.
 
 ## TODO
-- Add an automatic test that: creates routine files and performs every possible operation to test for expected result, delete test routine files, output a test report to see if every feature works, if not give the user a link to the github issues tab.
 - Add categories
 - Add a PySide6 UI
 - Add the "Week Viewer"
