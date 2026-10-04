@@ -1,6 +1,8 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
-
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QMessageBox
+from PyQt6.QtCore import QTimer, QTime
+from PyQt6.QtGui import QFont, QIcon
 from itertools import islice
 import time
 from pathlib import Path
@@ -25,6 +27,7 @@ yesterday_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 last_week = current_week - 1 if current_week > 1 else 52
 last_month = current_month - 1 if current_month > 1 else 12
 last_year = datetime.today().year - 1
+
 
 script_dir = Path(__file__).resolve().parent
 statistics_folder = script_dir / "Statistics"
@@ -788,7 +791,30 @@ class routine_editor:
         self.progress = routine_progress()
 routine = routine_editor()
 
+icon_path = Path(__file__).parent / "Icon" / "routine_tracker_icon.png"
+class Tracker(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Routine Tracker v0.3")
+        self.setWindowIcon(QIcon(str(icon_path)))
+        self.resize(500, 500)
+        self.setFixedSize(500, 500)
 
+        # Widget functions
+        def add_button():
+            print("Add Routine clicked")
+
+        # Widgets
+        QPushButton("Add Routine", self, clicked = add_button).setGeometry(50, 50, 150, 40)
+        
+
+app = QApplication([])
+window = Tracker()
+window.show()
+app.exit(app.exec())
+
+
+"""
 try:
     action = int(input("What routine tool would you like to use?\n1. Routine adder (for adding routines or information to routines)\n2. Routine clearer (for removing a routine a whole day or infos from a routine)\n3. Routine editor (for editing various information about a routine)\n4. Routine reader (for printing todays routines)\n5. View statistics\n6. Exit\n"))
     if action == 1:
@@ -931,3 +957,4 @@ except TypeError as e:
 except Exception as e:
     print(f"{bcolor.FAIL}Ending script with error: {e}{bcolor.ENDC}")
 
+"""
