@@ -1,7 +1,7 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QMessageBox
-from PyQt6.QtCore import QTimer, QTime
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QMessageBox, QTimeEdit, QCheckBox, QSpinBox
+from PyQt6.QtCore import QTimer, QTime, Qt
 from PyQt6.QtGui import QFont, QIcon
 from itertools import islice
 import time
@@ -792,6 +792,94 @@ class routine_editor:
 routine = routine_editor()
 
 icon_path = Path(__file__).parent / "Icon" / "routine_tracker_icon.png"
+class AddRoutineWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Add a Routine")
+        self.resize(300, 300)
+        self.setFixedSize(300, 300)
+        self.setWindowIcon(QIcon(str(icon_path)))
+
+        # Widgets
+        self.daySelect = QComboBox(self)
+        self.daySelect.setGeometry(10, 10, 170, 20)
+        self.daySelect.addItems(["Select day to add to...", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+        self.nameEnter = QLineEdit(self)
+        self.nameEnter.setGeometry(10, 40, 200, 30)
+        self.nameEnter.setPlaceholderText("Enter name of your routine")
+        self.timeSelect = QTimeEdit(self)
+        self.timeSelect.setGeometry(10, 110, 100, 30)
+        self.timeSelect.setEnabled(False)
+        self.timeNeeded = QCheckBox("Do you want your routine at a certain time?", self)
+        self.timeNeeded.setGeometry(10, 80, 300, 20)
+        self.timeNeeded.stateChanged.connect(self.onStateChangedTime)
+        self.durationChoose = QSpinBox(self)
+        self.durationChoose.setGeometry(10, 150, 100, 30)
+        self.durationChoose.setSuffix(" min")
+        self.durationChoose.setMaximum(1440)
+        self.durationChoose.setMinimum(1)
+        self.durationChoose.valueChanged.connect(self.onDurationChange)
+        self.subdurationAmount = QSpinBox(self)
+        self.subdurationAmount.setGeometry(10, 230, 100, 30)
+        self.subdurationAmount.setMaximum(1)
+        self.subdurationAmount.setEnabled(False)
+        self.subdurationNeeded = QCheckBox("Do you want subdurations for phases of your routine?", self)
+        self.subdurationNeeded.setGeometry(10, 190, 300, 30)
+        self.subdurationNeeded.stateChanged.connect(self.onStateChangedSubdur)
+
+    def onDurationChange(self):
+        self.durationChooseValue = self.durationChoose.value()
+        self.subdurationAmount.setMaximum(self.durationChooseValue)
+
+    def onStateChangedTime(self):
+        if self.timeNeeded.isChecked():
+            self.timeSelect.setEnabled(True)
+        else:
+            self.timeSelect.setEnabled(False)
+
+    def onStateChangedSubdur(self):
+        if self.subdurationNeeded.isChecked():
+            self.subdurationAmount.setEnabled(True)
+        else:
+            self.subdurationAmount.setEnabled(False)
+
+
+
+class AddSomethingWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Choose what to add...")
+        self.resize(400, 200)
+        self.setFixedSize(400, 200)
+        self.setWindowIcon(QIcon(str(icon_path)))
+
+        # Widget functions
+        def AddRoutine():
+            self.close()
+            self.RoutineWindow = AddRoutineWindow()
+            self.RoutineWindow.show()
+
+        def AddTime():
+            pass
+
+        def AddDuration():
+            pass
+
+        def AddSubdur():
+            pass
+
+        def close():
+            self.close()
+
+        # Widgets
+        QLabel("What would you like to add?", self).setGeometry(125, 10, 150, 20)
+        QPushButton("Add a Routine", self, clicked = AddRoutine).setGeometry(40, 50, 150, 40)
+        QPushButton("Add a Time", self, clicked = AddTime).setGeometry(210, 50, 150, 40)
+        QPushButton("Add a Duration", self, clicked = AddDuration).setGeometry(40, 100, 150, 40)
+        QPushButton("Add a Subduration", self, clicked = AddSubdur).setGeometry(210, 100, 150, 40)
+        QPushButton("Cancel", self, clicked = close).setGeometry(125, 150, 150, 20)
+
+
 class Tracker(QWidget):
     def __init__(self):
         super().__init__()
@@ -802,10 +890,11 @@ class Tracker(QWidget):
 
         # Widget functions
         def add_button():
-            print("Add Routine clicked")
+            self.addingwindow = AddSomethingWindow()
+            self.addingwindow.show()
 
         # Widgets
-        QPushButton("Add Routine", self, clicked = add_button).setGeometry(50, 50, 150, 40)
+        QPushButton("Add something...", self, clicked = add_button).setGeometry(50, 50, 150, 40)
         
 
 app = QApplication([])
