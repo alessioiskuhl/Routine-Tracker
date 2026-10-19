@@ -1,13 +1,14 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel, QLineEdit, QComboBox, QMessageBox, QTimeEdit, QCheckBox, QSpinBox
-from PyQt6.QtCore import QTimer, QTime, Qt
-from PyQt6.QtGui import QFont, QIcon
-from itertools import islice
+from datetime import datetime, timedelta
 import time
 from pathlib import Path
 import json
-class bcolor:
+from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+class Bcolor:
+    """Defining colors for text"""
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -17,7 +18,7 @@ class bcolor:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-from datetime import datetime, timedelta
+
 dt = datetime.now()
 current_day = dt.isoweekday()
 current_date = datetime.today().strftime('%Y-%m-%d')
@@ -41,11 +42,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}monday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}monday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to monday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to monday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "tuesday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -53,11 +54,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}tuesday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}tuesday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to tuesday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to tuesday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "wednesday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -65,11 +66,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}wednesday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}wednesday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to wednesday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to wednesday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "thursday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -77,11 +78,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}thursday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}thursday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to thursday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to thursday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "friday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -89,11 +90,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}friday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}friday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to friday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to friday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "saturday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -101,11 +102,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}saturday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}saturday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to saturday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to saturday_routines.json: {e}{Bcolor.ENDC}")
 file_path = routines_folder / "sunday_routines.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -113,11 +114,11 @@ try:
             "routines": [],
             f"progress{current_date}" : []
         }))
-    print(f"{bcolor.OKGREEN}sunday_routines.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}sunday_routines.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to sunday_routines.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to sunday_routines.json: {e}{Bcolor.ENDC}")
 file_path = statistics_folder / "statistics.json"
 try:
     with open(file_path, "x", encoding="utf-8") as file:
@@ -137,12 +138,12 @@ try:
                 f"Current streak status ({current_date})" : "None",
             }]
         }, indent=4))
-    print(f"{bcolor.OKGREEN}statistics.json didn't exist. Successfully created and wrote data.{bcolor.ENDC}")
+    print(f"{Bcolor.OKGREEN}statistics.json didn't exist. Successfully created and wrote data.{Bcolor.ENDC}")
 
 except FileExistsError:
     pass
 except Exception as e:
-    print(f"{bcolor.FAIL}An error occurred while creating or writing to statistics.json: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}An error occurred while creating or writing to statistics.json: {e}{Bcolor.ENDC}")
 
 with open(statistics_folder / "statistics.json", "r+", encoding="utf-8") as file:
     data = json.load(file)
@@ -424,12 +425,12 @@ class routine_adder:
         for routine in data["routines"]:
             if routine["name"] == name:
                 if routine.get(field) is not None:
-                    raise AssertionError(f"{bcolor.FAIL}There is already a {field} for the routine {name} in your {day_name} routines{bcolor.ENDC}")
+                    raise AssertionError(f"{Bcolor.FAIL}There is already a {field} for the routine {name} in your {day_name} routines{Bcolor.ENDC}")
                 routine[field] = value
                 self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully added {field} to the routine {name} in your {day_name} routines{bcolor.ENDC}"
+                return f"{Bcolor.OKGREEN}Successfully added {field} to the routine {name} in your {day_name} routines{Bcolor.ENDC}"
 
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
+        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
 
 
     def routine(self, day, name, time, duration, subdurations):
@@ -445,11 +446,11 @@ class routine_adder:
 
         for existing in data["routines"]:
             if existing["name"] == new_routine["name"]:
-                raise Exception(f"{bcolor.FAIL}There is already a routine with the name {new_routine['name']} in your {day_name} routines{bcolor.ENDC}")
+                raise Exception(f"{Bcolor.FAIL}There is already a routine with the name {new_routine['name']} in your {day_name} routines{Bcolor.ENDC}")
 
         data["routines"].append(new_routine)
         self._save_data(path, data)
-        return f"{bcolor.OKGREEN}Successfully added routine {name} to your {day_name} routines{bcolor.ENDC}"
+        return f"{Bcolor.OKGREEN}Successfully added routine {name} to your {day_name} routines{Bcolor.ENDC}"
 
     def time(self, day, name, time):
         return self._set_field(day, name, "time", time)
@@ -504,11 +505,11 @@ class routine_clearer:
         path, data = self._load_data(day_name)
 
         if not data["routines"]:
-            raise AssertionError(f"{bcolor.FAIL}There are no routines in your {day_name} routines to clear{bcolor.ENDC}")
+            raise AssertionError(f"{Bcolor.FAIL}There are no routines in your {day_name} routines to clear{Bcolor.ENDC}")
 
         data["routines"] = []
         self._save_data(path, data)
-        return f"{bcolor.OKGREEN}Successfully cleared all routines from your {day_name} routines{bcolor.ENDC}"
+        return f"{Bcolor.OKGREEN}Successfully cleared all routines from your {day_name} routines{Bcolor.ENDC}"
 
     def _clear_routine(self, day, name):
         day_name = self._normalize_day(day)
@@ -518,9 +519,9 @@ class routine_clearer:
             if routine["name"] == name:
                 del data["routines"][i]
                 self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully cleared the routine {name} from your {day_name} routines{bcolor.ENDC}"
+                return f"{Bcolor.OKGREEN}Successfully cleared the routine {name} from your {day_name} routines{Bcolor.ENDC}"
 
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
+        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
     
     def _clear_field(self, day, name, field):
         day_name = self._normalize_day(day)
@@ -529,12 +530,12 @@ class routine_clearer:
         for routine in data["routines"]:
             if routine["name"] == name:
                 if routine.get(field) is None:
-                    raise AssertionError(f"{bcolor.FAIL}There is already no value in {field} for the routine {name} in your {day_name} routines{bcolor.ENDC}")
+                    raise AssertionError(f"{Bcolor.FAIL}There is already no value in {field} for the routine {name} in your {day_name} routines{Bcolor.ENDC}")
                 routine[field] = None
                 self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully cleared {field} from the routine {name} in your {day_name} routines{bcolor.ENDC}"
+                return f"{Bcolor.OKGREEN}Successfully cleared {field} from the routine {name} in your {day_name} routines{Bcolor.ENDC}"
 
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
+        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
 
 
     def day(self, day):
@@ -599,9 +600,9 @@ class routine_edit:
             if routine["name"] == name:
                 data["routines"][i]["name"] = new_name
                 self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully edited the routine {name} in your {day_name} routines{bcolor.ENDC}"
+                return f"{Bcolor.OKGREEN}Successfully edited the routine {name} in your {day_name} routines{Bcolor.ENDC}"
 
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
+        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
         
     def _edit_field(self, day, name, field, new_value):
         day_name = self._normalize_day(day)
@@ -610,12 +611,12 @@ class routine_edit:
         for routine in data["routines"]:
             if routine["name"] == name:
                 if routine.get(field) is None:
-                    raise AssertionError(f"{bcolor.FAIL}There is no value in {field} for the routine {name} in your {day_name} routines, please add a value to {field} first using the add option{bcolor.ENDC}")
+                    raise AssertionError(f"{Bcolor.FAIL}There is no value in {field} for the routine {name} in your {day_name} routines, please add a value to {field} first using the add option{Bcolor.ENDC}")
                 routine[field] = new_value
                 self._save_data(path, data)
-                return f"{bcolor.OKGREEN}Successfully edited {field} for the routine {name} in your {day_name} routines{bcolor.ENDC}"
+                return f"{Bcolor.OKGREEN}Successfully edited {field} for the routine {name} in your {day_name} routines{Bcolor.ENDC}"
 
-        raise AssertionError(f"{bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{bcolor.ENDC}")
+        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
     
     def name(self, day, name, new_name):
         return self._edit_name(day, name, new_name)
@@ -639,7 +640,7 @@ class routine_reader:
                     print(f"for {monday_routines["routines"][i]["duration"]} minutes", end = " ") if monday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {monday_routines["routines"][i]["time"]}") if monday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         elif day == 2:
             if tuesday_routines["routines"]:
@@ -649,7 +650,7 @@ class routine_reader:
                     print(f"for {tuesday_routines["routines"][i]["duration"]} minutes", end = " ") if tuesday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {tuesday_routines["routines"][i]["time"]}") if tuesday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         elif day == 3:
             if wednesday_routines["routines"]:
@@ -659,7 +660,7 @@ class routine_reader:
                     print(f"for {wednesday_routines["routines"][i]["duration"]} minutes", end = " ") if wednesday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {wednesday_routines["routines"][i]["time"]}") if wednesday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         elif day == 4:
             if thursday_routines["routines"]:
@@ -669,7 +670,7 @@ class routine_reader:
                     print(f"for {thursday_routines["routines"][i]["duration"]} minutes", end = " ") if thursday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {thursday_routines["routines"][i]["time"]}") if thursday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         elif day == 5:
             if friday_routines["routines"]:
@@ -679,7 +680,7 @@ class routine_reader:
                     print(f"for {friday_routines["routines"][i]["duration"]} minutes", end = " ") if friday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {friday_routines["routines"][i]["time"]}") if friday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         elif day == 6:
             if saturday_routines["routines"]:
@@ -689,7 +690,7 @@ class routine_reader:
                     print(f"for {saturday_routines["routines"][i]["duration"]} minutes", end = " ") if saturday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {saturday_routines["routines"][i]["time"]}") if saturday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
         else:
             if sunday_routines["routines"]:
@@ -699,7 +700,7 @@ class routine_reader:
                     print(f"for {sunday_routines["routines"][i]["duration"]} minutes", end = " ") if sunday_routines["routines"][i]["duration"] is not None else None 
                     print(f"at {sunday_routines["routines"][i]["time"]}") if sunday_routines["routines"][i]["time"] is not None else None
             else:
-                print(f"{bcolor.WARNING}NOTE: Choose option 1 to add a routine {bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}NOTE: Choose option 1 to add a routine {Bcolor.ENDC}")
                 return "No routine today!"
 
     def completion_status(self):
@@ -710,12 +711,12 @@ class routine_reader:
 
         progress_key = f"progress{current_date}"
         if progress_key not in data:
-            print(f"{bcolor.WARNING}No progress data found for {day_name} routines on {current_date}.{bcolor.ENDC}")
+            print(f"{Bcolor.WARNING}No progress data found for {day_name} routines on {current_date}.{Bcolor.ENDC}")
             return
 
         print(f"Completion Status for {day_name.capitalize()} Routines on {current_date}:")
         if not data["routines"]:
-            raise AssertionError(f"{bcolor.FAIL}No routines found for {day_name} routines. Please add routines to track completion status!{bcolor.ENDC}")
+            raise AssertionError(f"{Bcolor.FAIL}No routines found for {day_name} routines. Please add routines to track completion status!{Bcolor.ENDC}")
             return
         for routine in data["routines"]:
             routine_name = routine["name"]
@@ -743,7 +744,7 @@ class routine_player:
 
         for routine in routines:
             if f"routine_{routine['name']}_completed" in [key for progress in data[f"progress{current_date}"] for key in progress]:
-                print(f"{bcolor.WARNING}Routine '{routine['name']}' has already been completed today. Skipping.{bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}Routine '{routine['name']}' has already been completed today. Skipping.{Bcolor.ENDC}")
                 continue
             print(f"Starting routine: {routine['name']}")
             if routine.get("duration") not in ("None", None):
@@ -757,9 +758,9 @@ class routine_player:
                         while time.time() - start < int(subduration) * 60:
                             print(f"Time remaining: {int(int(subduration) * 60 - (time.time() - start))} seconds", end="\r")
                             pass
-                        print(f"{bcolor.OKGREEN}Finished subduration {i + 1} of {len(subdurations)}: {subduration} minutes{bcolor.ENDC}")
+                        print(f"{Bcolor.OKGREEN}Finished subduration {i + 1} of {len(subdurations)}: {subduration} minutes{Bcolor.ENDC}")
                     if i == len(subdurations) - 1:
-                        print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+                        print(f"{Bcolor.OKGREEN}Finished routine: {routine['name']}{Bcolor.ENDC}")
                         progress_tracker.complete(routine["name"])
                         next = input("Would you like to continue to the next routine? (y/n): ")
                         if next.lower() != "y":
@@ -772,7 +773,7 @@ class routine_player:
                     while time.time() - start < duration * 60:
                         print(f"Time remaining: {int(duration * 60 - (time.time() - start))} seconds", end="\r")
                         pass
-                    print(f"{bcolor.OKGREEN}Finished routine: {routine['name']}{bcolor.ENDC}")
+                    print(f"{Bcolor.OKGREEN}Finished routine: {routine['name']}{Bcolor.ENDC}")
                     progress_tracker.complete(routine["name"])
                     next = input("Would you like to continue to the next routine? (y/n): ")
                     if next.lower() != "y":
@@ -780,7 +781,7 @@ class routine_player:
             else:
                 print(f"No duration specified for routine: {routine['name']}. Skipping.")
             
-        print(f"{bcolor.OKGREEN}All routines for today have been completed!{bcolor.ENDC}")
+        print(f"{Bcolor.OKGREEN}All routines for today have been completed!{Bcolor.ENDC}")
 class routine_editor:
     def __init__(self):
         self.add = routine_adder()
@@ -796,9 +797,10 @@ class AddRoutineWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Add a Routine")
-        self.resize(300, 300)
-        self.setFixedSize(300, 300)
+        self.resize(380, 360)
+        self.setFixedSize(380, 360)
         self.setWindowIcon(QIcon(str(icon_path)))
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         # Widgets
         self.daySelect = QComboBox(self)
@@ -807,9 +809,11 @@ class AddRoutineWindow(QWidget):
         self.nameEnter = QLineEdit(self)
         self.nameEnter.setGeometry(10, 40, 200, 30)
         self.nameEnter.setPlaceholderText("Enter name of your routine")
+        QLabel("<- Name", self).setGeometry(220, 40, 100, 30)
         self.timeSelect = QTimeEdit(self)
         self.timeSelect.setGeometry(10, 110, 100, 30)
         self.timeSelect.setEnabled(False)
+        QLabel("<- Time", self).setGeometry(220, 110, 100, 30)
         self.timeNeeded = QCheckBox("Do you want your routine at a certain time?", self)
         self.timeNeeded.setGeometry(10, 80, 300, 20)
         self.timeNeeded.stateChanged.connect(self.onStateChangedTime)
@@ -819,13 +823,32 @@ class AddRoutineWindow(QWidget):
         self.durationChoose.setMaximum(1440)
         self.durationChoose.setMinimum(1)
         self.durationChoose.valueChanged.connect(self.onDurationChange)
+        QLabel("<- Duration", self).setGeometry(220, 150, 100, 30)
         self.subdurationAmount = QSpinBox(self)
         self.subdurationAmount.setGeometry(10, 230, 100, 30)
         self.subdurationAmount.setMaximum(1)
         self.subdurationAmount.setEnabled(False)
+        QLabel("<- Subduration amount", self).setGeometry(220, 230, 150, 30)
         self.subdurationNeeded = QCheckBox("Do you want subdurations for phases of your routine?", self)
-        self.subdurationNeeded.setGeometry(10, 190, 300, 30)
+        self.subdurationNeeded.setGeometry(10, 190, 330, 30)
         self.subdurationNeeded.stateChanged.connect(self.onStateChangedSubdur)
+        self.subdurationEnter = QLineEdit(self)
+        self.subdurationEnter.setGeometry(10, 270, 200, 30)
+        self.subdurationEnter.setPlaceholderText("subduration, subduration, ...")
+        QLabel("<- Subdurations", self).setGeometry(220, 270, 200, 30)
+        self.cancelButton = QPushButton("Cancel", self, clicked = self.cancelPressed)
+        self.cancelButton.setGeometry(40, 310, 150, 40)
+        self.cancelButton.setStyleSheet("color: red;")
+        self.createButton = QPushButton("Create Routine", self, clicked = startCreation)
+        self.createButton.setGeometry(210, 310, 150, 40)
+        self.createButton.setStyleSheet("color: red;")
+
+
+    def startCreation(self, name: str, time: )
+    def cancelPressed(self):
+        self.close()
+        self.addingwindow = AddSomethingWindow()
+        self.addingwindow.show()
 
     def onDurationChange(self):
         self.durationChooseValue = self.durationChoose.value()
@@ -852,6 +875,7 @@ class AddSomethingWindow(QWidget):
         self.resize(400, 200)
         self.setFixedSize(400, 200)
         self.setWindowIcon(QIcon(str(icon_path)))
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
         # Widget functions
         def AddRoutine():
@@ -877,7 +901,9 @@ class AddSomethingWindow(QWidget):
         QPushButton("Add a Time", self, clicked = AddTime).setGeometry(210, 50, 150, 40)
         QPushButton("Add a Duration", self, clicked = AddDuration).setGeometry(40, 100, 150, 40)
         QPushButton("Add a Subduration", self, clicked = AddSubdur).setGeometry(210, 100, 150, 40)
-        QPushButton("Cancel", self, clicked = close).setGeometry(125, 150, 150, 20)
+        self.cancelButton = QPushButton("Cancel", self, clicked = close)
+        self.cancelButton.setGeometry(125, 150, 150, 20)
+        self.cancelButton.setStyleSheet("color: red;")
 
 
 class Tracker(QWidget):
@@ -922,7 +948,7 @@ try:
                     if adder_option_1_subdurations_notlist.lower() != "none":
                         adder_option_1_subdurations = list(map(int, adder_option_1_subdurations_notlist.split(',')))
                         if int(sum(adder_option_1_subdurations)) != int(adder_option_1_duration):
-                            raise AssertionError(f"{bcolor.FAIL}Please enter subdurations adding up to you duration. Sum is: {sum(adder_option_1_subdurations)}, but duration is: {adder_option_1_duration}{bcolor.ENDC}")
+                            raise AssertionError(f"{Bcolor.FAIL}Please enter subdurations adding up to you duration. Sum is: {sum(adder_option_1_subdurations)}, but duration is: {adder_option_1_duration}{Bcolor.ENDC}")
                     else:
                         adder_option_1_subdurations = None
                 else:
@@ -948,7 +974,7 @@ try:
             print(routine.add.subdurations(adder_option_4_day, adder_option_4_name, adder_option_4_subdurations_notlist))
 
         else:
-            print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
+            print(f"{Bcolor.FAIL}Please only enter a number between 1 and 4!{Bcolor.ENDC}")
     elif action == 2:
         clearer_option = int(input("What would you like to clear?\n1. A whole day\n2. A routine\n3. A time from a routine\n4. A duration from a routine\n5. Subdurations from a routine\n"))
         if clearer_option == 1:
@@ -972,7 +998,7 @@ try:
             print(routine.clear.subdurations(clearer_option_5_day, clearer_option_5_name))
 
         else:
-            print(f"{bcolor.FAIL}Please only enter a number between 1 and 5!{bcolor.ENDC}")
+            print(f"{Bcolor.FAIL}Please only enter a number between 1 and 5!{Bcolor.ENDC}")
 
     elif action == 3:
         editor_option = int(input("What would you like to edit?\n1. The name of a routine\n2. A time from a routine\n3. A duration from a routine\n4. Subdurations from a routine\n"))
@@ -992,13 +1018,13 @@ try:
             editor_option_3_duration = input("Please enter the new duration you would like to change it to in minutes: ")
             print(routine.edit.duration(editor_option_3_day, editor_option_3_name, editor_option_3_duration))
         elif editor_option == 4:
-            print(f"{bcolor.FAIL}NOTE: All previously added subdurations will be deleted if you add new subdurations!{bcolor.ENDC}")
+            print(f"{Bcolor.FAIL}NOTE: All previously added subdurations will be deleted if you add new subdurations!{Bcolor.ENDC}")
             editor_option_4_day = int(input("From what day would you like to edit subdurations (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             editor_option_4_name = str(input("Please enter the name of your routine: "))
             editor_option_4_subdurations_notlist = input("Please enter your new subdurations in minutes with a comma and a space between the numbers: ")
             print(routine.edit.subdurations(editor_option_4_day, editor_option_4_name, list(map(int, editor_option_4_subdurations_notlist.split(',')))))
         else:
-            print(f"{bcolor.FAIL}Please only enter a number between 1 and 4!{bcolor.ENDC}")
+            print(f"{Bcolor.FAIL}Please only enter a number between 1 and 4!{Bcolor.ENDC}")
 
     elif action == 4:
         option_4 = input("What would you like to view?\n1. Today's routine\n2. A specific day's routine\n3. The completion status of today's routines\n")
@@ -1006,23 +1032,23 @@ try:
             if routine.read.routine(current_day) != "No routine today!":
                 play_choice = input("\n\nWould you like to play your routine? (y/n): ")
                 if play_choice.lower() == "y":
-                    print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
+                    print(f"{Bcolor.OKGREEN}Starting your routine!{Bcolor.ENDC}")
                     routine.play.play_routine()
                 elif play_choice.lower() == "n":
-                    print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
+                    print(f"{Bcolor.WARNING}You chose not to play your routine. Exiting the program.{Bcolor.ENDC}")
             else:
-                print(f"{bcolor.WARNING}You have no routine today. Exiting the program.{bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}You have no routine today. Exiting the program.{Bcolor.ENDC}")
         elif option_4 == "2":
             specific_day = int(input("Please enter the day you would like to view (1. Monday, 2. Tuesday, 3. Wednesday, 4. Thursday, 5. Friday, 6. Saturday, 7. Sunday): "))
             if routine.read.routine(specific_day) != "No routine today!":
                 play_choice = input("\n\nWould you like to play your routine? (y/n): ")
                 if play_choice.lower() == "y":
-                    print(f"{bcolor.OKGREEN}Starting your routine!{bcolor.ENDC}")
+                    print(f"{Bcolor.OKGREEN}Starting your routine!{Bcolor.ENDC}")
                     routine.play.play_routine()
                 elif play_choice.lower() == "n":
-                    print(f"{bcolor.WARNING}You chose not to play your routine. Exiting the program.{bcolor.ENDC}")
+                    print(f"{Bcolor.WARNING}You chose not to play your routine. Exiting the program.{Bcolor.ENDC}")
             else:
-                print(f"{bcolor.WARNING}You have no routine for {_normalize_day(specific_day)}. Exiting the program.{bcolor.ENDC}")
+                print(f"{Bcolor.WARNING}You have no routine for {_normalize_day(specific_day)}. Exiting the program.{Bcolor.ENDC}")
         elif option_4 == "3":
             routine.read.completion_status()
     elif action == 5:
@@ -1032,18 +1058,18 @@ try:
             for key, value in stats.items():
                 print(f"{key} = {value}")
     elif action == 6:
-        print(f"{bcolor.FAIL}Exiting the programm...{bcolor.ENDC}")
+        print(f"{Bcolor.FAIL}Exiting the programm...{Bcolor.ENDC}")
         exit()
 
     else:
-        print(f"{bcolor.FAIL}Please only enter a number between 1 and 6!{bcolor.ENDC}")
+        print(f"{Bcolor.FAIL}Please only enter a number between 1 and 6!{Bcolor.ENDC}")
 
             
 except ValueError as e:
-    print(f"{bcolor.FAIL}Please only enter valid formats! {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}Please only enter valid formats! {e}{Bcolor.ENDC}")
 except TypeError as e:
-    print(f"{bcolor.FAIL}Please make sure you followed the instructions for the format! The following error occured: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}Please make sure you followed the instructions for the format! The following error occured: {e}{Bcolor.ENDC}")
 except Exception as e:
-    print(f"{bcolor.FAIL}Ending script with error: {e}{bcolor.ENDC}")
+    print(f"{Bcolor.FAIL}Ending script with error: {e}{Bcolor.ENDC}")
 
 """
