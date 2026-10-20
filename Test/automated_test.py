@@ -44,16 +44,40 @@ def load_isolated_module(temp_dir):
             for node in ast.walk(statement)
         )
 
+    def is_qt_event_loop(statement):
+        if not isinstance(statement, ast.Expr):
+            return False
+        call = statement.value
+        return (
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Attribute)
+            and call.func.attr == "exit"
+            and isinstance(call.func.value, ast.Name)
+            and call.func.value.id == "app"
+            and len(call.args) == 1
+            and isinstance(call.args[0], ast.Call)
+            and isinstance(call.args[0].func, ast.Attribute)
+            and call.args[0].func.attr == "exec"
+            and isinstance(call.args[0].func.value, ast.Name)
+            and call.args[0].func.value.id == "app"
+        )
+
     syntax_tree.body = [
         statement
         for statement in syntax_tree.body
-        if not is_interactive_cli(statement)
+        if not is_interactive_cli(statement) and not is_qt_event_loop(statement)
     ]
     namespace = {
         "__name__": "routine_tracker_under_test",
         "__file__": str(Path(temp_dir) / "main.py"),
     }
     exec(compile(syntax_tree, str(MAIN_PATH), "exec"), namespace)
+    window = namespace.get("window")
+    app = namespace.get("app")
+    if window is not None and app is not None:
+        window.setWindowModality(namespace["Qt"].WindowModality.ApplicationModal)
+        window.setEnabled(False)
+        app.processEvents()
     return namespace
 
 
@@ -387,6 +411,13 @@ def run_tests():
 
         for name, callback in tests:
             check(name, callback)
+
+        window = module.get("window")
+        app = module.get("app")
+        if window is not None and app is not None:
+            window.close()
+            app.processEvents()
+            app.quit()
 
     if temp_dir_path.exists():
         all_tests_passed = False

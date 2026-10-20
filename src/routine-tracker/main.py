@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 import time
 from pathlib import Path
 import json
-from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox, QMessageBox
+from PyQt6.QtCore import Qt, QTime
 from PyQt6.QtGui import QIcon
 class Bcolor:
     """Defining colors for text"""
@@ -28,6 +28,7 @@ yesterday_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 last_week = current_week - 1 if current_week > 1 else 52
 last_month = current_month - 1 if current_month > 1 else 12
 last_year = datetime.today().year - 1
+
 
 
 script_dir = Path(__file__).resolve().parent
@@ -433,7 +434,7 @@ class routine_adder:
         raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
 
 
-    def routine(self, day, name, time, duration, subdurations):
+    def routine(self, day, name, time, duration, subdurations: list):
         day_name = self._normalize_day(day)
         path, data = self._load_data(day_name)
 
@@ -797,8 +798,8 @@ class AddRoutineWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Add a Routine")
-        self.resize(380, 360)
-        self.setFixedSize(380, 360)
+        self.resize(380, 310)
+        self.setFixedSize(380, 310)
         self.setWindowIcon(QIcon(str(icon_path)))
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
@@ -812,6 +813,7 @@ class AddRoutineWindow(QWidget):
         QLabel("<- Name", self).setGeometry(220, 40, 100, 30)
         self.timeSelect = QTimeEdit(self)
         self.timeSelect.setGeometry(10, 110, 100, 30)
+        self.timeSelect.setTimeRange(QTime(0, 0, 0), QTime(23, 59, 0))
         self.timeSelect.setEnabled(False)
         QLabel("<- Time", self).setGeometry(220, 110, 100, 30)
         self.timeNeeded = QCheckBox("Do you want your routine at a certain time?", self)
@@ -822,37 +824,48 @@ class AddRoutineWindow(QWidget):
         self.durationChoose.setSuffix(" min")
         self.durationChoose.setMaximum(1440)
         self.durationChoose.setMinimum(1)
-        self.durationChoose.valueChanged.connect(self.onDurationChange)
         QLabel("<- Duration", self).setGeometry(220, 150, 100, 30)
-        self.subdurationAmount = QSpinBox(self)
-        self.subdurationAmount.setGeometry(10, 230, 100, 30)
-        self.subdurationAmount.setMaximum(1)
-        self.subdurationAmount.setEnabled(False)
-        QLabel("<- Subduration amount", self).setGeometry(220, 230, 150, 30)
         self.subdurationNeeded = QCheckBox("Do you want subdurations for phases of your routine?", self)
         self.subdurationNeeded.setGeometry(10, 190, 330, 30)
         self.subdurationNeeded.stateChanged.connect(self.onStateChangedSubdur)
         self.subdurationEnter = QLineEdit(self)
-        self.subdurationEnter.setGeometry(10, 270, 200, 30)
+        self.subdurationEnter.setGeometry(10, 220, 200, 30)
         self.subdurationEnter.setPlaceholderText("subduration, subduration, ...")
-        QLabel("<- Subdurations", self).setGeometry(220, 270, 200, 30)
+        self.subdurationEnter.setEnabled(False)
+        QLabel("<- Subdurations", self).setGeometry(220, 220, 200, 30)
         self.cancelButton = QPushButton("Cancel", self, clicked = self.cancelPressed)
-        self.cancelButton.setGeometry(40, 310, 150, 40)
+        self.cancelButton.setGeometry(40, 260, 150, 40)
         self.cancelButton.setStyleSheet("color: red;")
-        self.createButton = QPushButton("Create Routine", self, clicked = startCreation)
-        self.createButton.setGeometry(210, 310, 150, 40)
-        self.createButton.setStyleSheet("color: red;")
+        self.createButton = QPushButton("Create Routine", self, clicked = self.startCreation)
+        self.createButton.setGeometry(210, 260, 150, 40)
+        self.createButton.setStyleSheet("color: green;")
 
 
-    def startCreation(self, name: str, time: )
+    def startCreation(self):
+        day = self.daySelect.currentText()
+        name = self.nameEnter.text()
+        time = self.timeSelect.time().toString() if self.timeNeeded.isChecked() else None
+        dur = self.durationChoose.value()
+        try:
+            subdur = list(map(int, self.subdurationEnter.text().split(','))) if self.subdurationNeeded.isChecked() else None
+        except ValueError:
+            QMessageBox.critical(self, "Error", "Please only enter numbers as subdurations. Don't do something like \"2 min, 4 min, 3 min\" as the tracker already expects the numbers to be in minutes.")
+            return None
+        if day == "Select day to add to...":
+            QMessageBox.critical(self, "Error", "Please choose a day to add the routine to.")
+            return None
+        elif not name:
+            QMessageBox.critical(self, "Error", "Please enter a name for your routine")
+            return None
+        else:                 
+            routine.add.routine(day, name, time, dur, subdur)
+            QMessageBox.information(self, "Succesfully created", f"The routine {name} was succesfully added to {day}" if time == None else f"The routine {name} was succesfully added to {day} at {time}")
+            self.close()
+        
     def cancelPressed(self):
         self.close()
         self.addingwindow = AddSomethingWindow()
         self.addingwindow.show()
-
-    def onDurationChange(self):
-        self.durationChooseValue = self.durationChoose.value()
-        self.subdurationAmount.setMaximum(self.durationChooseValue)
 
     def onStateChangedTime(self):
         if self.timeNeeded.isChecked():
@@ -862,9 +875,9 @@ class AddRoutineWindow(QWidget):
 
     def onStateChangedSubdur(self):
         if self.subdurationNeeded.isChecked():
-            self.subdurationAmount.setEnabled(True)
+            self.subdurationEnter.setEnabled(True)
         else:
-            self.subdurationAmount.setEnabled(False)
+            self.subdurationEnter.setEnabled(False)
 
 
 
