@@ -457,11 +457,11 @@ class routine_adder:
 
         for existing in data["routines"]:
             if existing["name"] == new_routine["name"]:
-                raise Exception(f"{Bcolor.FAIL}There is already a routine with the name {new_routine['name']} in your {day_name} routines{Bcolor.ENDC}")
+                raise Exception(f"There is already a routine with the name {new_routine['name']} in your {day_name} routines")
 
         data["routines"].append(new_routine)
         self._save_data(path, data)
-        return f"{Bcolor.OKGREEN}Successfully added routine {name} to your {day_name} routines{Bcolor.ENDC}"
+        return f"Successfully added routine {name} to your {day_name} routines"
 
     def time(self, day, name, time):
         return self._set_field(day, name, "time", time)
@@ -605,15 +605,17 @@ class routine_edit:
     
     def _edit_name(self, day, name, new_name):
         day_name = self._normalize_day(day)
-        path, data = self._load_data(day_name)
+        path, data = self._load_data(day_name)   
 
         for i, routine in enumerate(data["routines"]):
             if routine["name"] == name:
+                if name == new_name:
+                    raise AssertionError(f"The routine is already named {new_name}")
                 data["routines"][i]["name"] = new_name
                 self._save_data(path, data)
-                return f"{Bcolor.OKGREEN}Successfully edited the routine {name} in your {day_name} routines{Bcolor.ENDC}"
+                return f"Successfully edited the routine {name} in your {day_name} routines"
 
-        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
+        raise AssertionError(f"There is no routine with the name {name} in your {day_name} routines")
         
     def _edit_field(self, day, name, field, new_value):
         day_name = self._normalize_day(day)
@@ -622,21 +624,18 @@ class routine_edit:
         for routine in data["routines"]:
             if routine["name"] == name:
                 if routine.get(field) is None:
-                    raise AssertionError(f"{Bcolor.FAIL}There is no value in {field} for the routine {name} in your {day_name} routines, please add a value to {field} first using the add option{Bcolor.ENDC}")
+                    raise AssertionError(f"There is no value in {field} for the routine {name} in your {day_name} routines, please add a value to {field} first using the add option")
                 routine[field] = new_value
                 self._save_data(path, data)
-                return f"{Bcolor.OKGREEN}Successfully edited {field} for the routine {name} in your {day_name} routines{Bcolor.ENDC}"
+                return f"Successfully edited {field} for the routine {name} in your {day_name} routines"
 
-        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
+        raise AssertionError(f"There is no routine with the name {name} in your {day_name} routines")
     
     def name(self, day, name, new_name):
         return self._edit_name(day, name, new_name)
 
     def time(self, day, name, time):
         return self._edit_field(day, name, "time", time)
-
-    def duration(self, day, name, duration):
-        return self._edit_field(day, name, "duration", duration)
 
     def subdurations(self, day, name, subdurations):
         return self._edit_field(day, name, "subdurations", subdurations)
