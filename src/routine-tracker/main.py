@@ -293,8 +293,114 @@ class EditNameWindow(QWidget):
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"The following error occured: {e}")
         
+class EditTimeWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Edit the time of a routine")
+        self.resize(380, 170)
+        self.setFixedSize(380, 170)
+        self.setWindowIcon(QIcon(str(icon_path)))
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
 
+        # Widgets
+        self.daySelect = QComboBox(self)
+        self.daySelect.setGeometry(10, 10, 170, 20)
+        self.daySelect.addItems(["Select day of routine...", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+        self.nameEnter = QLineEdit(self)
+        self.nameEnter.setGeometry(10, 40, 200, 30)
+        self.nameEnter.setPlaceholderText("Enter name of the routine")
+        QLabel("<- Name of routine", self).setGeometry(220, 40, 150, 30)
+        self.newTimeEnter = QTimeEdit(self)
+        self.newTimeEnter.setGeometry(10, 80, 200, 30)
+        self.newTimeEnter.setTimeRange(QTime(0, 0, 0), QTime(23, 59, 59))
+        QLabel("<- New time of routine", self).setGeometry(220, 80, 150, 30)
+        self.cancelButton = QPushButton("Cancel", self, clicked = self.cancelPressed)
+        self.cancelButton.setGeometry(40, 120, 150, 40)
+        self.cancelButton.setStyleSheet("color: red;")
+        self.changeButton = QPushButton("Change time", self, clicked = self.editTime)
+        self.changeButton.setGeometry(210, 120, 150, 40)
+        self.changeButton.setStyleSheet("color: green;")
 
+    def cancelPressed(self):
+        self.close()
+        self.editSomethingWindow = EditSomethingWindow()
+        self.editSomethingWindow.show()
+
+    def editTime(self):
+        day = self.daySelect.currentText()
+        name = self.nameEnter.text()
+        new_time = self.newTimeEnter.time().toString()
+        if day == "Select day to add to...":
+            QMessageBox.critical(self, "Error", "Please choose a day to add the routine to.")
+            return None
+        elif not name:
+            QMessageBox.critical(self, "Error", "Please enter the name of the routine")
+            return None
+        else:
+            try:
+                routine.edit.time(day, name, new_time)
+                QMessageBox.information(self, "Succesfully edited", f"The routine {name} is now planned for {new_time}")
+                self.close()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"The following error occured: {e}")
+        
+class EditSubdurationsWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Edit the subdurations of a routine")
+        self.resize(380, 170)
+        self.setFixedSize(380, 170)
+        self.setWindowIcon(QIcon(str(icon_path)))
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+        # Widgets
+        self.daySelect = QComboBox(self)
+        self.daySelect.setGeometry(10, 10, 170, 20)
+        self.daySelect.addItems(["Select day of routine...", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+        self.nameEnter = QLineEdit(self)
+        self.nameEnter.setGeometry(10, 40, 200, 30)
+        self.nameEnter.setPlaceholderText("Enter name of the routine")
+        QLabel("<- Name of routine", self).setGeometry(220, 40, 150, 30)
+        self.newSubdurationsEnter = QLineEdit(self)
+        self.newSubdurationsEnter.setGeometry(10, 80, 200, 30)
+        self.newSubdurationsEnter.setPlaceholderText("subduration, subduration, ...")
+        QLabel("<- New subdurations of routine", self).setGeometry(220, 80, 150, 30)
+        self.cancelButton = QPushButton("Cancel", self, clicked = self.cancelPressed)
+        self.cancelButton.setGeometry(40, 120, 150, 40)
+        self.cancelButton.setStyleSheet("color: red;")
+        self.changeButton = QPushButton("Change subdurations", self, clicked = self.editSubdurations)
+        self.changeButton.setGeometry(210, 120, 150, 40)
+        self.changeButton.setStyleSheet("color: green;")
+
+    def cancelPressed(self):
+        self.close()
+        self.editSomethingWindow = EditSomethingWindow()
+        self.editSomethingWindow.show()
+
+    def editSubdurations(self):
+        day = self.daySelect.currentText()
+        name = self.nameEnter.text()
+        new_subdurations = self.newSubdurationsEnter.text()
+        try:
+            subdur = list(map(int, self.newSubdurationsEnter.text().split(',')))
+        except ValueError:
+            QMessageBox.critical(self, "Error", "Please only enter whole numbers as subdurations. Don't do something like \"2 min, 4 min, 3 min\" or \"2.5, 4.3, 3.14159\"as the tracker already expects the numbers to be in minutes.")
+            return None
+        if day == "Select day to add to...":
+            QMessageBox.critical(self, "Error", "Please choose a day to add the routine to.")
+            return None
+        elif not name:
+            QMessageBox.critical(self, "Error", "Please enter the name of the routine")
+            return None
+        else:
+            try:
+                routine.edit.subdurations(day, name, subdur)
+                QMessageBox.information(self, "Succesfully edited", f"The routine {name} now has the following subdurations: {new_subdurations}")
+                self.close()
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"The following error occured: {e}")
+
+        
 class AddSomethingWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -356,10 +462,14 @@ class EditSomethingWindow(QWidget):
         self.editNameWindow.show()
 
     def timeEdit(self):
-        pass
+        self.close()
+        self.editTimeWindow = EditTimeWindow()
+        self.editTimeWindow.show()
 
     def subdurationsEdit(self):
-        pass
+        self.close()
+        self.editSubdurationsWindow = EditSubdurationsWindow()
+        self.editSubdurationsWindow.show()
 
 
 class ClearSomethingWindow(QWidget):

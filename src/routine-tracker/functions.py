@@ -620,6 +620,17 @@ class routine_edit:
     def _edit_field(self, day, name, field, new_value):
         day_name = self._normalize_day(day)
         path, data = self._load_data(day_name)
+        if field == "subdurations" and not isinstance(new_value, list):
+            try:
+                new_value = list(map(int, new_value.split(',')))
+            except ValueError:
+                raise ValueError("Please only enter numbers as subdurations. Don't do something like \"2 min, 4 min, 3 min\" as the tracker already expects the numbers to be in minutes.")
+        if field == "subdurations":
+            for routine in data["routines"]:
+                if routine["name"] == name:
+                    if sum(new_value) != routine["duration"]:
+                        raise ValueError(f"Your subdurations don't add up to the duration. They must add up to {routine["duration"]}")
+        
 
         for routine in data["routines"]:
             if routine["name"] == name:
