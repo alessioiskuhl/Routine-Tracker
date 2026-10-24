@@ -511,17 +511,6 @@ class routine_clearer:
         with path.open("w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
-    def _clear_day(self, day):
-        day_name = self._normalize_day(day)
-        path, data = self._load_data(day_name)
-
-        if not data["routines"]:
-            raise AssertionError(f"{Bcolor.FAIL}There are no routines in your {day_name} routines to clear{Bcolor.ENDC}")
-
-        data["routines"] = []
-        self._save_data(path, data)
-        return f"{Bcolor.OKGREEN}Successfully cleared all routines from your {day_name} routines{Bcolor.ENDC}"
-
     def _clear_routine(self, day, name):
         day_name = self._normalize_day(day)
         path, data = self._load_data(day_name)
@@ -530,9 +519,9 @@ class routine_clearer:
             if routine["name"] == name:
                 del data["routines"][i]
                 self._save_data(path, data)
-                return f"{Bcolor.OKGREEN}Successfully cleared the routine {name} from your {day_name} routines{Bcolor.ENDC}"
+                return f"Successfully cleared the routine {name} from your {day_name} routines"
 
-        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
+        raise AssertionError(f"There is no routine with the name {name} in your {day_name} routines")
     
     def _clear_field(self, day, name, field):
         day_name = self._normalize_day(day)
@@ -541,25 +530,19 @@ class routine_clearer:
         for routine in data["routines"]:
             if routine["name"] == name:
                 if routine.get(field) is None:
-                    raise AssertionError(f"{Bcolor.FAIL}There is already no value in {field} for the routine {name} in your {day_name} routines{Bcolor.ENDC}")
+                    raise AssertionError(f"There is already no value in {field} for the routine {name} in your {day_name} routines")
                 routine[field] = None
                 self._save_data(path, data)
-                return f"{Bcolor.OKGREEN}Successfully cleared {field} from the routine {name} in your {day_name} routines{Bcolor.ENDC}"
+                return f"Successfully cleared {field} from the routine {name} in your {day_name} routines"
 
-        raise AssertionError(f"{Bcolor.FAIL}There is no routine with the name {name} in your {day_name} routines{Bcolor.ENDC}")
+        raise AssertionError(f"There is no routine with the name {name} in your {day_name} routines")
 
-
-    def day(self, day):
-        return self._clear_day(day)
 
     def routine(self, day, name):
         return self._clear_routine(day, name)
 
     def time(self, day, name):
         return self._clear_field(day, name, "time")
-
-    def duration(self, day, name):
-        return self._clear_field(day, name, "duration")
 
     def subdurations(self, day, name):
         return self._clear_field(day, name, "subdurations")
