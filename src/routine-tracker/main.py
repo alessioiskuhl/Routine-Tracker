@@ -1,11 +1,11 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
-from functions import routine_player, routine_reader, routine_edit, routine_clearer, routine_adder, routine_progress
+from functions import routine_player, routine_reader, routine_edit, routine_clearer, routine_adder, routine_progress, table_display
 from datetime import datetime, timedelta
 import time
 from pathlib import Path
 import json
-from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox, QMessageBox, QTableWidget
+from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem
 from PyQt6.QtCore import Qt, QTime
 from PyQt6.QtGui import QIcon
 class Bcolor:
@@ -37,10 +37,12 @@ class routine_editor:
         self.read = routine_reader()
         self.play = routine_player()
         self.progress = routine_progress()
+        self.table = table_display()
 routine = routine_editor()
 
 
 icon_path = Path(__file__).parent / "Icon" / "routine_tracker_icon.png"
+statistics_path = Path(__file__).parent / "Statistics" / "statistics.json"
 class AddRoutineWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -645,6 +647,50 @@ class ClearSomethingWindow(QWidget):
         self.clearSubdurationsWindow.show()
 
 
+class StatisticsWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Statistics")
+        self.resize(400, 400)
+        self.setFixedSize(400, 400)
+        self.setWindowIcon(QIcon(str(icon_path)))
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        with statistics_path.open(encoding = "utf-8") as file:
+            statistics = json.load(file)
+        stats = statistics["statistics"][0]
+
+
+        QLabel("Completions today: ", self).setGeometry(10, 10, 150, 30)
+        QLabel("Completions this week: ", self).setGeometry(10, 40, 150, 30)
+        QLabel("Completions this month: ", self).setGeometry(10, 70, 150, 30)
+        QLabel("Completions this year: ", self).setGeometry(10, 100, 150, 30)
+        QLabel("Completions yesterday: ", self).setGeometry(10, 130, 150, 30)
+        QLabel("Completions last week: ", self).setGeometry(10, 160, 150, 30)
+        QLabel("Completions last month: ", self).setGeometry(10, 190, 150, 30)
+        QLabel("Completions last year: ", self).setGeometry(10, 220, 150, 30)
+        QLabel("Completions all time: ", self).setGeometry(10, 250, 150, 30)
+        QLabel("Current streak: ", self).setGeometry(10, 280, 150, 30)
+        QLabel("Longest streak: ", self).setGeometry(10, 310, 150, 30)
+        QLabel("Current streak status: ", self).setGeometry(10, 340, 150, 30)
+        QLabel(stats[f"completions today ({current_date})"], self).setGeometry(160, 10, 150, 30)
+        """
+        QLabel(, self).setGeometry(160, 40, 150, 30)
+        QLabel(, self).setGeometry(160, 70, 150, 30)
+        QLabel(, self).setGeometry(160, 100, 150, 30)
+        QLabel(, self).setGeometry(160, 130, 150, 30)
+        QLabel(, self).setGeometry(160, 160, 150, 30)
+        QLabel(, self).setGeometry(160, 190, 150, 30)
+        QLabel(, self).setGeometry(160, 220, 150, 30)
+        QLabel(, self).setGeometry(160, 250, 150, 30)
+        QLabel(, self).setGeometry(160, 280, 150, 30)
+        QLabel(, self).setGeometry(160, 310, 150, 30)
+        QLabel(, self).setGeometry(160, 340, 150, 30)
+        """
+        self.cancelButton = QPushButton("Cancel", self, clicked = self.close)
+        self.cancelButton.setGeometry(10, 370, 150, 25)
+        self.cancelButton.setStyleSheet("color: red;")
+
+
 class Tracker(QWidget):
     def __init__(self):
         super().__init__()
@@ -680,31 +726,51 @@ class Tracker(QWidget):
         QPushButton("Friday", self, clicked = self.viewFriday).setGeometry(297, 155, 58, 20)
         QPushButton("Saturday", self, clicked = self.viewSaturday).setGeometry(360, 155, 65, 20)
         QPushButton("Sunday", self, clicked = self.viewSunday).setGeometry(430, 155, 65, 20)
+        QPushButton("View Statistics", self, clicked = self.displayStatistics).setGeometry(10, 400, 230, 75)
+        self.closeButton = QPushButton("Exit", self, clicked = self.close)
+        self.closeButton.setGeometry(260, 400, 230, 75)
+        self.closeButton.setStyleSheet("color: red;")
         self.weekViewer = QTableWidget(1, 1, self)
         self.weekViewer.setGeometry(10, 180, 485, 200)
+        self.weekViewer.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.weekViewer.setColumnCount(4)
+        self.weekViewer.setRowCount(1000)
+        self.weekViewer.setColumnWidth(0, 100)
+        self.weekViewer.setColumnWidth(1, 75)
+        self.weekViewer.setColumnWidth(2, 100)
+        self.weekViewer.setColumnWidth(3, 155)
+        self.weekViewer.setItem(0, 0, QTableWidgetItem("Routine"))
+        self.weekViewer.setItem(0, 1, QTableWidgetItem("Time"))
+        self.weekViewer.setItem(0, 2, QTableWidgetItem("Duration"))
+        self.weekViewer.setItem(0, 3, QTableWidgetItem("Subdurations"))
+        self.weekViewer.setItem(1, 0, QTableWidgetItem("Select a day"))
     
 
 
     def viewMonday(self):
-        pass
+        routine.table.display(1, self.weekViewer)
 
     def viewTuesday(self):
-            pass
+            routine.table.display(2, self.weekViewer)
 
     def viewWednesday(self):
-            pass
+            routine.table.display(3, self.weekViewer)
 
     def viewThursday(self):
-            pass
+            routine.table.display(4, self.weekViewer)
 
     def viewFriday(self):
-            pass
+            routine.table.display(5, self.weekViewer)
 
     def viewSaturday(self):
-            pass
+            routine.table.display(6, self.weekViewer)
 
     def viewSunday(self):
-            pass
+            routine.table.display(7, self.weekViewer)
+
+    def displayStatistics(self):
+        self.statisticsWindow = StatisticsWindow()
+        self.statisticsWindow.show()
         
 
 app = QApplication([])

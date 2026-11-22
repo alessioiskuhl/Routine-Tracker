@@ -1,5 +1,6 @@
 """All functions for the main python file are in this file"""
 
+from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 from datetime import datetime, timedelta
 import time
 from pathlib import Path
@@ -786,5 +787,64 @@ class routine_player:
                 print(f"No duration specified for routine: {routine['name']}. Skipping.")
             
         print(f"{Bcolor.OKGREEN}All routines for today have been completed!{Bcolor.ENDC}")
+
+
+class table_display:
+    DAY_FILES = {
+        "monday": "monday_routines.json",
+        "tuesday": "tuesday_routines.json",
+        "wednesday": "wednesday_routines.json",
+        "thursday": "thursday_routines.json",
+        "friday": "friday_routines.json",
+        "saturday": "saturday_routines.json",
+        "sunday": "sunday_routines.json",
+    }
+    DAY_NUMBERS = {
+        1: "monday",
+        2: "tuesday",
+        3: "wednesday",
+        4: "thursday",
+        5: "friday",
+        6: "saturday",
+        7: "sunday",
+    }
+        
+    @classmethod
+    def _normalize_day(cls, day):
+        if isinstance(day, int):
+            return cls.DAY_NUMBERS[day]
+        return str(day).lower()
+    
+    @classmethod
+    def _load_data(cls, day):
+        day_name = cls._normalize_day(day)
+        path = routines_folder / f"{day_name}_routines.json"
+        with path.open(encoding="utf-8") as file:
+            return path, json.load(file)
+        
+    @staticmethod
+    def _save_data(path, data):
+        with path.open("w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+
+    def display(self, day, tableObject: QTableWidget):
+        path, data = self._load_data(self._normalize_day(day))
+
+        if data["routines"]:
+            i = 1
+            for routine in data["routines"]:
+                tableObject.setItem(i, 0, QTableWidgetItem(routine["name"]))
+                tableObject.setItem(i, 1, QTableWidgetItem(routine["time"]))
+                tableObject.setItem(i, 2, QTableWidgetItem(str(routine["duration"]) + " min"))
+                tableObject.setItem(i, 3, QTableWidgetItem(str(routine["subdurations"])))
+                i += 1
+        else:
+            for i in range(1, 999):
+                tableObject.setItem(i, 0, QTableWidgetItem(""))
+                tableObject.setItem(i, 1, QTableWidgetItem(""))
+                tableObject.setItem(i, 2, QTableWidgetItem(""))
+                tableObject.setItem(i, 3, QTableWidgetItem(""))
+
+
 
 
