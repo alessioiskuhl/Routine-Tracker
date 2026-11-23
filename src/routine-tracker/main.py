@@ -648,47 +648,48 @@ class ClearSomethingWindow(QWidget):
 
 
 class StatisticsWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Statistics")
-        self.resize(400, 400)
-        self.setFixedSize(400, 400)
-        self.setWindowIcon(QIcon(str(icon_path)))
-        self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        with statistics_path.open(encoding = "utf-8") as file:
-            statistics = json.load(file)
-        stats = statistics["statistics"][0]
+    try:
+        def __init__(self):
+            super().__init__()
+            self.setWindowTitle("Statistics")
+            self.resize(400, 400)
+            self.setFixedSize(400, 400)
+            self.setWindowIcon(QIcon(str(icon_path)))
+            self.setWindowModality(Qt.WindowModality.ApplicationModal)
+            with statistics_path.open(encoding = "utf-8") as file:
+                statistics = json.load(file)
+            stats = statistics["statistics"][0]
 
-
-        QLabel("Completions today: ", self).setGeometry(10, 10, 150, 30)
-        QLabel("Completions this week: ", self).setGeometry(10, 40, 150, 30)
-        QLabel("Completions this month: ", self).setGeometry(10, 70, 150, 30)
-        QLabel("Completions this year: ", self).setGeometry(10, 100, 150, 30)
-        QLabel("Completions yesterday: ", self).setGeometry(10, 130, 150, 30)
-        QLabel("Completions last week: ", self).setGeometry(10, 160, 150, 30)
-        QLabel("Completions last month: ", self).setGeometry(10, 190, 150, 30)
-        QLabel("Completions last year: ", self).setGeometry(10, 220, 150, 30)
-        QLabel("Completions all time: ", self).setGeometry(10, 250, 150, 30)
-        QLabel("Current streak: ", self).setGeometry(10, 280, 150, 30)
-        QLabel("Longest streak: ", self).setGeometry(10, 310, 150, 30)
-        QLabel("Current streak status: ", self).setGeometry(10, 340, 150, 30)
-        QLabel(stats[f"completions today ({current_date})"], self).setGeometry(160, 10, 150, 30)
-        """
-        QLabel(, self).setGeometry(160, 40, 150, 30)
-        QLabel(, self).setGeometry(160, 70, 150, 30)
-        QLabel(, self).setGeometry(160, 100, 150, 30)
-        QLabel(, self).setGeometry(160, 130, 150, 30)
-        QLabel(, self).setGeometry(160, 160, 150, 30)
-        QLabel(, self).setGeometry(160, 190, 150, 30)
-        QLabel(, self).setGeometry(160, 220, 150, 30)
-        QLabel(, self).setGeometry(160, 250, 150, 30)
-        QLabel(, self).setGeometry(160, 280, 150, 30)
-        QLabel(, self).setGeometry(160, 310, 150, 30)
-        QLabel(, self).setGeometry(160, 340, 150, 30)
-        """
-        self.cancelButton = QPushButton("Cancel", self, clicked = self.close)
-        self.cancelButton.setGeometry(10, 370, 150, 25)
-        self.cancelButton.setStyleSheet("color: red;")
+            QLabel("Completions today: ", self).setGeometry(10, 10, 150, 30)
+            QLabel("Completions this week: ", self).setGeometry(10, 40, 150, 30)
+            QLabel("Completions this month: ", self).setGeometry(10, 70, 150, 30)
+            QLabel("Completions this year: ", self).setGeometry(10, 100, 150, 30)
+            QLabel("Completions yesterday: ", self).setGeometry(10, 130, 150, 30)
+            QLabel("Completions last week: ", self).setGeometry(10, 160, 150, 30)
+            QLabel("Completions last month: ", self).setGeometry(10, 190, 150, 30)
+            QLabel("Completions last year: ", self).setGeometry(10, 220, 150, 30)
+            QLabel("Completions all time: ", self).setGeometry(10, 250, 150, 30)
+            QLabel("Current streak: ", self).setGeometry(10, 280, 150, 30)
+            QLabel("Longest streak: ", self).setGeometry(10, 310, 150, 30)
+            QLabel("Current streak status: ", self).setGeometry(10, 340, 150, 30)
+            QLabel(str(stats[f"completions today ({current_date})"]), self).setGeometry(160, 10, 150, 30)
+            QLabel(str(stats[f"completions this week ({current_week})"]), self).setGeometry(160, 40, 150, 30)
+            QLabel(str(stats[f"completions this month ({current_month})"]), self).setGeometry(160, 70, 150, 30)
+            QLabel(str(stats[f"completions this year ({datetime.today().year})"]), self).setGeometry(160, 100, 150, 30)
+            QLabel(str(stats[f"completions yesterday ({yesterday_date})"]), self).setGeometry(160, 130, 150, 30)
+            QLabel(str(stats[f"completions last week ({last_week})"]), self).setGeometry(160, 160, 150, 30)
+            QLabel(str(stats[f"completions last month ({last_month})"]), self).setGeometry(160, 190, 150, 30)
+            QLabel(str(stats[f"completions last year ({datetime.today().year - 1})"]), self).setGeometry(160, 220, 150, 30)
+            QLabel(str(stats[f"completions all time"]), self).setGeometry(160, 250, 150, 30)
+            QLabel(str(stats[f"Current Streak ({current_date})"]), self).setGeometry(160, 280, 150, 30)
+            QLabel(str(stats[f"Longest Streak ({current_date})"]), self).setGeometry(160, 310, 150, 30)
+            QLabel(str(stats[f"Current streak status ({current_date})"]), self).setGeometry(160, 340, 150, 30)
+            self.cancelButton = QPushButton("Cancel", self, clicked = self.close)
+            self.cancelButton.setGeometry(10, 370, 150, 25)
+            self.cancelButton.setStyleSheet("color: red;")
+            
+    except KeyError as e:
+        QMessageBox.critical(self, "Statistics error", f"A problem occured while trying to show the statistics. This may be because Routine-Tracker couldn't properly update the statistics, please send the following error message to the issues tab in my github repository (https://github.com/alessioiskuhl/Routine-Tracker/issues): {e}")
 
 
 class Tracker(QWidget):
