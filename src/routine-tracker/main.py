@@ -727,7 +727,10 @@ class Tracker(QWidget):
         QPushButton("Friday", self, clicked = self.viewFriday).setGeometry(297, 155, 58, 20)
         QPushButton("Saturday", self, clicked = self.viewSaturday).setGeometry(360, 155, 65, 20)
         QPushButton("Sunday", self, clicked = self.viewSunday).setGeometry(430, 155, 65, 20)
-        QPushButton("View Statistics", self, clicked = self.displayStatistics).setGeometry(10, 400, 230, 75)
+        QPushButton("View Statistics", self, clicked = self.displayStatistics).setGeometry(10, 440, 230, 35)
+        self.PlayButton = QPushButton("Play Routine", self, clicked = self.PlayClicked)
+        self.PlayButton.setGeometry(10, 400, 230, 35)
+        self.PlayButton.setEnabled(False)
         self.closeButton = QPushButton("Exit", self, clicked = self.close)
         self.closeButton.setGeometry(260, 400, 230, 75)
         self.closeButton.setStyleSheet("color: red;")
@@ -745,6 +748,7 @@ class Tracker(QWidget):
         self.weekViewer.setItem(0, 2, QTableWidgetItem("Duration"))
         self.weekViewer.setItem(0, 3, QTableWidgetItem("Subdurations"))
         self.weekViewer.setItem(1, 0, QTableWidgetItem("Select a day"))
+        self.weekViewer.itemSelectionChanged.connect(self.selected)
     
 
 
@@ -772,6 +776,17 @@ class Tracker(QWidget):
     def displayStatistics(self):
         self.statisticsWindow = StatisticsWindow()
         self.statisticsWindow.show()
+
+    def selected(self):
+        selected_rows = [index.row() for index in self.weekViewer.selectionModel().selectedRows()]
+        if selected_rows:
+            self.selected_row = selected_rows[0]
+            self.PlayButton.setEnabled(True)
+        else:
+            self.PlayButton.setEnabled(False)
+
+    def PlayClicked(self):
+        pass
         
 
 app = QApplication([])
