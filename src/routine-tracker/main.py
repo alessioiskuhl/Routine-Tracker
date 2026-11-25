@@ -1,5 +1,7 @@
 """A simple routine tracker that allows you to track and time your daily routines."""
 
+"""For anyone reading this, don't keep reading (90% chance of an eye infection). Thank you!"""
+
 from functions import routine_player, routine_reader, routine_edit, routine_clearer, routine_adder, routine_progress, table_display
 from datetime import datetime, timedelta
 import time
@@ -754,39 +756,77 @@ class Tracker(QWidget):
 
     def viewMonday(self):
         routine.table.display(1, self.weekViewer)
+        self.selectedDay = "monday"
 
     def viewTuesday(self):
-            routine.table.display(2, self.weekViewer)
+        routine.table.display(2, self.weekViewer)
+        self.selectedDay = "tuesday"
 
     def viewWednesday(self):
-            routine.table.display(3, self.weekViewer)
+        routine.table.display(3, self.weekViewer)
+        self.selectedDay = "wednesday"
 
     def viewThursday(self):
-            routine.table.display(4, self.weekViewer)
+        routine.table.display(4, self.weekViewer)
+        self.selectedDay = "thursday"
 
     def viewFriday(self):
-            routine.table.display(5, self.weekViewer)
+        routine.table.display(5, self.weekViewer)
+        self.selectedDay = "friday"
 
     def viewSaturday(self):
-            routine.table.display(6, self.weekViewer)
+        routine.table.display(6, self.weekViewer)
+        self.selectedDay = "saturday"
 
     def viewSunday(self):
-            routine.table.display(7, self.weekViewer)
+        routine.table.display(7, self.weekViewer)
+        self.selectedDay = "sunday"
 
     def displayStatistics(self):
         self.statisticsWindow = StatisticsWindow()
         self.statisticsWindow.show()
 
     def selected(self):
-        selected_rows = [index.row() for index in self.weekViewer.selectionModel().selectedRows()]
+        selected_rows = []
+        for index in self.weekViewer.selectionModel().selectedRows():
+            selected_rows.append(int(index.row()))
+        selected_items = []
+        for item in self.weekViewer.selectedItems():
+            selected_items.append(item.row())
         if selected_rows:
             self.selected_row = selected_rows[0]
-            self.PlayButton.setEnabled(True)
+            if self.selected_row != 0:
+                self.PlayButton.setEnabled(True)
+            else:
+                self.PlayButton.setEnabled(False)
+        elif selected_items:
+            self.selected_row = selected_items[0]
+            if self.selected_row != 0:
+                self.PlayButton.setEnabled(True)
+            else:
+                self.PlayButton.setEnabled(False)
         else:
             self.PlayButton.setEnabled(False)
 
     def PlayClicked(self):
-        pass
+        routines_folder = Path(__file__).resolve().parent / "Routines"
+        try:
+            path = routines_folder / f"{self.selectedDay}_routines.json"
+        except AttributeError as e:
+            QMessageBox.critical(self, "Select a day", "Select a day to play a routine from.")
+            return None
+        with path.open(encoding="utf-8") as file:
+            data = json.load(file)
+        routines = data["routines"]
+        PlayQuestion = QMessageBox.question(self, "Play routine", f"Are you sure you want to start the timer for the routine {self.weekViewer.item(self.selected_row, 0).text()}")
+        if PlayQuestion == 16384:
+            self.PlayBox = QMessageBox(self)
+            self.PlayBox.setWindowTitle(f"Playing routine {self.weekViewer.item(self.selected_row, 0).text()}")
+            self.PlayBox.setText("Hello")
+            self.PlayBox.show()
+        else:
+            return None
+            
         
 
 app = QApplication([])

@@ -1,5 +1,7 @@
 """All functions for the main python file are in this file"""
 
+"""For anyone reading this, don't keep reading (90% chance of an eye infection). Thank you!"""
+
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 from datetime import datetime, timedelta
 import time
@@ -829,6 +831,7 @@ class table_display:
 
     def display(self, day, tableObject: QTableWidget):
         path, data = self._load_data(self._normalize_day(day))
+        
 
         if data["routines"]:
             i = 1
