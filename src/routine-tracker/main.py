@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 import json
 from PyQt6.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QLineEdit, QComboBox, QTimeEdit, QCheckBox, QSpinBox, QMessageBox, QTableWidget, QAbstractItemView, QTableWidgetItem
-from PyQt6.QtCore import Qt, QTime
+from PyQt6.QtCore import Qt, QTime, QTimer
 from PyQt6.QtGui import QIcon
 class Bcolor:
     """Defining colors for text"""
@@ -650,8 +650,8 @@ class ClearSomethingWindow(QWidget):
 
 
 class StatisticsWindow(QWidget):
-    try:
-        def __init__(self):
+    def __init__(self):
+        try:
             super().__init__()
             self.setWindowTitle("Statistics")
             self.resize(400, 400)
@@ -690,8 +690,31 @@ class StatisticsWindow(QWidget):
             self.cancelButton.setGeometry(10, 370, 150, 25)
             self.cancelButton.setStyleSheet("color: red;")
             
-    except KeyError as e:
-        QMessageBox.critical(self, "Statistics error", f"A problem occured while trying to show the statistics. This may be because Routine-Tracker couldn't properly update the statistics, please send the following error message to the issues tab in my github repository (https://github.com/alessioiskuhl/Routine-Tracker/issues): {e}")
+        except KeyError as e:
+            QMessageBox.critical(self, "Statistics error", f"A problem occured while trying to show the statistics. This may be because Routine-Tracker couldn't properly update the statistics, please send the following error message to the issues tab in my github repository (https://github.com/alessioiskuhl/Routine-Tracker/issues): {e}")
+
+class PlayBox(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(str(icon_path)))
+        self.resize(500, 200)
+        self.setFixedSize(500, 200)
+        self.textLabel = QLabel("", self)
+        self.textLabel.setGeometry(10, 10, 130, 30)
+
+    def start(self, subduration: int) -> None:
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.timerTimeout)
+        self.timer.start(subduration / 3600)
+        return None
+
+    def timerTimeout(self):
+        self.time_left_int -= 1
+
+        
+
+    def updateGUI(self):
+
 
 
 class Tracker(QWidget):
@@ -818,16 +841,34 @@ class Tracker(QWidget):
         with path.open(encoding="utf-8") as file:
             data = json.load(file)
         routines = data["routines"]
+        routine_name = self.weekViewer.item(self.selected_row, 0).text()
         PlayQuestion = QMessageBox.question(self, "Play routine", f"Are you sure you want to start the timer for the routine {self.weekViewer.item(self.selected_row, 0).text()}")
         if PlayQuestion == 16384:
-            self.PlayBox = QMessageBox(self)
-            self.PlayBox.setWindowTitle(f"Playing routine {self.weekViewer.item(self.selected_row, 0).text()}")
-            self.PlayBox.setText("Hello")
+            print("Yes clicked")
+            self.PlayBox = PlayBox()
+            self.PlayBox.setWindowTitle(f"Playing routine {routine_name}")
             self.PlayBox.show()
+            print("showing box")
+            for routine in routines:
+                print("checking routine")
+                if routine["name"] == routine_name:
+                    print("found correct routine")
+                    if routine.get("duration") not in ("None", None):
+                        print("it has a duration")
+                        if routine.get("subdurations") not in ("None", None, [], ""):
+                            print("it has a subduration")
+                            subdurations = routine["subdurations"]
+                            if isinstance(subdurations, str):
+                                print("subdurations was a string")
+                                subdurations = list(map(int, subdurations.split(',')))
+                            for subduration in subdurations:
+                                print("first subbduration")
+                                self.PlayBox.start(subduration)
+        
         else:
             return None
             
-        
+    
 
 app = QApplication([])
 window = Tracker()
