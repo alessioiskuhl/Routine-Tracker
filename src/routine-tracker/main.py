@@ -702,18 +702,19 @@ class PlayBox(QWidget):
         self.textLabel = QLabel("", self)
         self.textLabel.setGeometry(10, 10, 130, 30)
 
-    def start(self, subduration: int) -> None:
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.timerTimeout)
-        self.timer.start(subduration / 3600)
-        return None
 
-    def timerTimeout(self):
-        self.time_left_int -= 1
+    def start(self, subduration: int) -> None:
+        self.remaining = (subduration / 60)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updateLabel)
+        self.timer.start((subduration / 60) / 1000)
+
+    def updateLabel(self):
+        self.remaining -= 1
+        self.textLabel.setText(str(f"Time remaining: {self.remaining} seconds"))
+        if self.remaining 
 
         
-
-    def updateGUI(self):
 
 
 
